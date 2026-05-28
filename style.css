@@ -1,0 +1,616 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Zen+Maru+Gothic:wght@400;500;700&family=Shippori+Mincho:wght@400;600;800&display=swap');
+
+/* ───────────────────────────────────────────
+   VARIABLES — Palette chaleureuse anime
+─────────────────────────────────────────── */
+:root {
+  --akane:     #D94F3D;   /* rouge torii */
+  --kaki:      #C8753A;   /* orange brique */
+  --kogane:    #E8A830;   /* or soleil couchant */
+  --sakura:    #F2B5A0;   /* rose sakura doux */
+  --shiro:     #FDFAF5;   /* blanc chaud parchemin */
+  --shiro2:    #FFF8F0;   /* blanc crème */
+  --kuro:      #2A1A0E;   /* brun noir encre */
+  --sumi:      #4A2E1A;   /* sumi-e brun foncé */
+  --cha:       #8B5E3C;   /* thé brun */
+  --mizu:      #6BA3A8;   /* bleu-vert eau froide */
+  --accent-glow: rgba(216,79,61,.25);
+
+  --r: 12px;
+  --shadow-warm: 0 4px 20px rgba(200, 117, 58, .18);
+  --shadow-deep: 0 8px 40px rgba(42, 26, 14, .22);
+}
+
+/* ───────────────────────────────────────────
+   RESET & BASE
+─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Zen Maru Gothic', 'Noto Serif JP', serif;
+  background-color: #F5EDE0;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(232,168,48,.15) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8753a' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  color: var(--kuro);
+  min-height: 100vh;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ───────────────────────────────────────────
+   HEADER / BANNIÈRE
+─────────────────────────────────────────── */
+header {
+  position: relative;
+  background: linear-gradient(135deg, var(--akane) 0%, var(--kaki) 45%, var(--kogane) 100%);
+  padding: 0;
+  overflow: hidden;
+}
+
+.header-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 32px 22px;
+}
+
+/* Motif ondulé style kakemono */
+header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Ccircle cx='100' cy='100' r='90' stroke='rgba(255,255,255,.06)' stroke-width='2' fill='none'/%3E%3Ccircle cx='100' cy='100' r='60' stroke='rgba(255,255,255,.04)' stroke-width='1.5' fill='none'/%3E%3Ccircle cx='100' cy='100' r='30' stroke='rgba(255,255,255,.06)' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  background-size: 220px;
+  opacity: .6;
+}
+
+/* Grand kanji décoratif */
+header::after {
+  content: '日本';
+  position: absolute;
+  right: -20px;
+  bottom: -30px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 200px;
+  font-weight: 800;
+  color: rgba(255,255,255,.06);
+  line-height: 1;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.site-logo {
+  display: flex;
+  flex-direction: column;
+}
+
+.site-logo .jp-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--shiro);
+  letter-spacing: .1em;
+  line-height: 1;
+  text-shadow: 0 2px 12px rgba(0,0,0,.3);
+}
+
+.site-logo .fr-subtitle {
+  font-size: .82rem;
+  font-weight: 500;
+  color: rgba(255,255,255,.8);
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  margin-top: 5px;
+}
+
+.header-stamp {
+  width: 80px;
+  height: 80px;
+  border: 3px solid rgba(255,255,255,.7);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--shiro);
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  background: rgba(255,255,255,.12);
+  box-shadow: inset 0 0 20px rgba(255,255,255,.1), 0 0 20px rgba(0,0,0,.2);
+  transform: rotate(-8deg);
+  flex-shrink: 0;
+}
+
+.header-stamp span {
+  font-size: .55rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  opacity: .85;
+}
+
+/* ───────────────────────────────────────────
+   NAVIGATION FORUM
+─────────────────────────────────────────── */
+nav {
+  background: var(--sumi);
+  border-bottom: 3px solid var(--kogane);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 3px 15px rgba(0,0,0,.35);
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 32px;
+  gap: 2px;
+}
+
+nav ul li a {
+  display: block;
+  padding: 14px 20px;
+  font-size: .88rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.7);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  transition: background .2s, color .2s;
+  position: relative;
+}
+
+nav ul li a:hover,
+nav ul li a.active {
+  color: var(--kogane);
+  background: rgba(232,168,48,.08);
+}
+
+nav ul li a.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: var(--kogane);
+  border-radius: 2px 2px 0 0;
+}
+
+/* ───────────────────────────────────────────
+   LAYOUT PRINCIPAL
+─────────────────────────────────────────── */
+.page-wrap {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 28px;
+  align-items: start;
+}
+
+/* ───────────────────────────────────────────
+   FORUM BOARD — CATÉGORIES
+─────────────────────────────────────────── */
+.board-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.board-title h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--sumi);
+  letter-spacing: .05em;
+}
+
+.board-title .kanji-tag {
+  font-family: 'Shippori Mincho', serif;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--shiro);
+  background: var(--akane);
+  padding: 3px 10px 2px;
+  border-radius: 4px;
+  letter-spacing: .1em;
+}
+
+/* Catégorie forum */
+.forum-category {
+  background: var(--shiro);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: var(--shadow-warm);
+  margin-bottom: 22px;
+  border: 1px solid rgba(200,117,58,.15);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  background: linear-gradient(90deg, var(--akane), var(--kaki));
+  color: var(--shiro);
+}
+
+.category-header .icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.category-header h3 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+
+.category-header .jp {
+  margin-left: auto;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.2rem;
+  opacity: .7;
+}
+
+/* Lignes de topics */
+.topic-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(200,117,58,.1);
+  transition: background .18s;
+  cursor: pointer;
+}
+
+.topic-row:last-child { border-bottom: none; }
+.topic-row:hover { background: rgba(232,168,48,.06); }
+
+.topic-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--kogane);
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(232,168,48,.5);
+}
+
+.topic-dot.new { background: var(--akane); box-shadow: 0 0 6px rgba(217,79,61,.6); }
+.topic-dot.hot { background: var(--kaki); box-shadow: 0 0 6px rgba(200,117,58,.6); }
+
+.topic-info { min-width: 0; }
+
+.topic-title {
+  font-size: .92rem;
+  font-weight: 700;
+  color: var(--sumi);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color .15s;
+}
+
+.topic-row:hover .topic-title { color: var(--akane); }
+
+.topic-meta {
+  font-size: .72rem;
+  color: var(--cha);
+  margin-top: 2px;
+  letter-spacing: .04em;
+}
+
+.topic-replies {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--cha);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.topic-replies span {
+  display: block;
+  font-size: .65rem;
+  font-weight: 400;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  opacity: .7;
+}
+
+.topic-tag {
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  letter-spacing: .05em;
+  white-space: nowrap;
+}
+
+.tag-new    { background: rgba(217,79,61,.12); color: var(--akane); }
+.tag-hot    { background: rgba(200,117,58,.15); color: var(--kaki); }
+.tag-guide  { background: rgba(107,163,168,.15); color: var(--mizu); }
+
+/* ───────────────────────────────────────────
+   ARTICLE ÉPINGLÉ / HERO POST
+─────────────────────────────────────────── */
+.hero-post {
+  background: var(--shiro);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: var(--shadow-deep);
+  margin-bottom: 28px;
+  border: 1px solid rgba(200,117,58,.2);
+  position: relative;
+}
+
+.hero-post-banner {
+  height: 160px;
+  background: linear-gradient(135deg, #7B2D1E 0%, #C8521A 50%, #E8A830 100%);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 20px 24px;
+  overflow: hidden;
+}
+
+.hero-post-banner::before {
+  content: '⛩';
+  position: absolute;
+  right: 24px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 90px;
+  opacity: .18;
+}
+
+.hero-post-banner .pin-badge {
+  background: var(--kogane);
+  color: var(--kuro);
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.hero-post-body { padding: 20px 24px 22px; }
+
+.hero-post-body h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--sumi);
+  line-height: 1.35;
+  margin-bottom: 10px;
+}
+
+.hero-post-body p {
+  font-size: .88rem;
+  color: var(--cha);
+  line-height: 1.75;
+}
+
+.hero-post-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  background: rgba(200,117,58,.06);
+  border-top: 1px solid rgba(200,117,58,.12);
+}
+
+.avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--akane), var(--kogane));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+  font-weight: 900; color: white;
+  border: 2px solid rgba(255,255,255,.6);
+}
+
+.post-author { font-size: .82rem; font-weight: 700; color: var(--sumi); }
+.post-date   { font-size: .75rem; color: var(--cha); margin-top: 1px; }
+.post-stats  { margin-left: auto; display: flex; gap: 14px; }
+
+.post-stats span {
+  font-size: .78rem;
+  color: var(--cha);
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* ───────────────────────────────────────────
+   SIDEBAR
+─────────────────────────────────────────── */
+.sidebar-widget {
+  background: var(--shiro);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: var(--shadow-warm);
+  margin-bottom: 22px;
+  border: 1px solid rgba(200,117,58,.15);
+}
+
+.widget-header {
+  padding: 12px 18px;
+  background: linear-gradient(90deg, var(--sumi), #6B3E25);
+  color: var(--shiro);
+  font-family: 'Shippori Mincho', serif;
+  font-size: .95rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.widget-body { padding: 16px 18px; }
+
+/* Widget Infos pratiques */
+.info-list { list-style: none; }
+
+.info-list li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(200,117,58,.1);
+  font-size: .83rem;
+}
+
+.info-list li:last-child { border-bottom: none; }
+
+.info-list .info-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.info-list .info-label {
+  font-weight: 700;
+  color: var(--sumi);
+  display: block;
+}
+
+.info-list .info-val {
+  color: var(--cha);
+  font-size: .78rem;
+}
+
+/* Widget membres actifs */
+.member-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.member-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(200,117,58,.08);
+  border-radius: 20px;
+  padding: 5px 10px 5px 6px;
+  border: 1px solid rgba(200,117,58,.18);
+  font-size: .76rem;
+  font-weight: 700;
+  color: var(--sumi);
+}
+
+.member-chip .av-sm {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; font-weight: 900; color: white;
+  flex-shrink: 0;
+}
+
+/* Widget Saisons / Calendrier */
+.season-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(200,117,58,.1);
+  font-size: .82rem;
+}
+
+.season-row:last-child { border-bottom: none; }
+
+.season-name { font-weight: 700; color: var(--sumi); }
+
+.season-jp {
+  font-family: 'Shippori Mincho', serif;
+  font-size: .9rem;
+  color: var(--akane);
+}
+
+.season-desc { color: var(--cha); font-size: .75rem; text-align: right; }
+
+/* ───────────────────────────────────────────
+   PAGINATION FORUM
+─────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 20px 0 0;
+  justify-content: center;
+}
+
+.pagination button {
+  min-width: 36px; height: 36px;
+  border: 1.5px solid rgba(200,117,58,.3);
+  background: var(--shiro);
+  color: var(--sumi);
+  border-radius: 8px;
+  font-family: 'Zen Maru Gothic', serif;
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .18s;
+  padding: 0 10px;
+}
+
+.pagination button:hover  { background: rgba(232,168,48,.12); border-color: var(--kogane); color: var(--sumi); }
+.pagination button.active { background: var(--akane); border-color: var(--akane); color: white; }
+
+/* ───────────────────────────────────────────
+   FOOTER
+─────────────────────────────────────────── */
+footer {
+  margin-top: 48px;
+  background: var(--sumi);
+  color: rgba(255,255,255,.55);
+  padding: 28px 32px;
+  text-align: center;
+  font-size: .78rem;
+  letter-spacing: .06em;
+  border-top: 3px solid var(--akane);
+}
+
+footer .footer-jp {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.6rem;
+  color: rgba(255,255,255,.1);
+  display: block;
+  margin-bottom: 8px;
+  letter-spacing: .2em;
+}
+
+/* ───────────────────────────────────────────
+   ANIMATIONS
+─────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.forum-category  { animation: fadeUp .45s ease both; }
+.forum-category:nth-child(2) { animation-delay: .1s; }
+.forum-category:nth-child(3) { animation-delay: .2s; }
+.hero-post       { animation: fadeUp .35s ease both; }
+.sidebar-widget  { animation: fadeUp .4s ease both; }
+
+/* ───────────────────────────────────────────
+   RESPONSIVE
+─────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .page-wrap { grid-template-columns: 1fr; }
+  .sidebar   { display: none; }
+  nav ul     { gap: 0; padding: 0 12px; }
+  nav ul li a { padding: 12px 12px; font-size: .78rem; }
+  .header-inner { padding: 18px 16px; }
+  .site-logo .jp-title { font-size: 1.9rem; }
+}
