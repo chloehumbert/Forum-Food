@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookime — Connexion</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="login.css">
+</head>
+<body class="login-page">
+ 
+<!-- ═══════════════════════════════════════════
+     HEADER
+════════════════════════════════════════════ -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="site-logo">
+      <span class="jp-title">Cookime</span>
+      <span class="fr-subtitle">Cookime — Bienvenue au pays du soleil levant</span>
+    </a>
+    <div class="header-stamp">
+      <span>☀</span>
+      <span>nippon</span>
+    </div>
+  </div>
+</header>
+ 
+<!-- ═══════════════════════════════════════════
+     NAVIGATION
+════════════════════════════════════════════ -->
+<nav>
+  <ul>
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="login.html" class="active">Connexion</a></li>
+  </ul>
+</nav>
+ 
+<!-- ═══════════════════════════════════════════
+     ZONE LOGIN
+════════════════════════════════════════════ -->
+<div class="login-wrapper">
+ 
+  <!-- Panneau décoratif gauche -->
+  <div class="login-deco" aria-hidden="true">
+    <div class="deco-kanji"></div>
+    <div class="deco-lines">
+      <span></span><span></span><span></span>
+    </div>
+    <ul class="deco-facts">
+      <li><span class="fact-jp">こんにちは</span><span class="fact-fr">Bienvenue</span></li>
+      <li><span class="fact-jp">ようこそ</span><span class="fact-fr">Soyez le bienvenu</span></li>
+      <li><span class="fact-jp">はじめまして</span><span class="fact-fr">Enchanté</span></li>
+    </ul>
+    <div class="deco-torii">⛩️</div>
+  </div>
+ 
+  <!-- Carte de connexion -->
+  <div class="login-card">
+ 
+    <div class="login-card-top">
+      <div class="login-avatar-ring">
+        <span></span>
+      </div>
+      <h1 class="login-title">
+        <span class="login-title-jp">ログイン</span>
+        <span class="login-title-fr">Connexion au forum</span>
+      </h1>
+    </div>
+ 
+    <!-- Alerte erreur (cachée par défaut, affichée par Go via template ou JS) -->
+    <div class="login-alert login-alert--error" id="alertError" style="display:none">
+      <span class="alert-icon">⚠</span>
+      <span id="alertMsg">Identifiants incorrects. Réessayez.</span>
+    </div>
+ 
+    <!-- Alerte succès -->
+    <div class="login-alert login-alert--success" id="alertSuccess" style="display:none">
+      <span class="alert-icon">✓</span>
+      <span>Connexion réussie ! Redirection…</span>
+    </div>
+ 
+    <!--
+      ACTION pointe vers le handler Go : POST /login
+      Le backend Go vérifie les credentials via Supabase
+    -->
+    <form class="login-form" id="loginForm" method="POST" action="/login" novalidate>
+ 
+      <!-- Champ email -->
+      <div class="field-group">
+        <label for="email" class="field-label">
+          <span class="field-label-jp">メール</span>
+          Adresse e-mail
+        </label>
+        <div class="field-wrap">
+          <span class="field-icon">✉</span>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="field-input"
+            placeholder="vous@exemple.com"
+            autocomplete="email"
+            required
+          >
+        </div>
+        <span class="field-error" id="emailError"></span>
+      </div>
+ 
+      <!-- Champ mot de passe -->
+      <div class="field-group">
+        <label for="password" class="field-label">
+          <span class="field-label-jp">パスワード</span>
+          Mot de passe
+        </label>
+        <div class="field-wrap">
+          <span class="field-icon">🔑</span>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="field-input"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          >
+          <button type="button" class="field-toggle" id="togglePwd" aria-label="Afficher le mot de passe">
+            👁
+          </button>
+        </div>
+        <span class="field-error" id="pwdError"></span>
+      </div>
+ 
+      <!-- Options -->
+      <div class="login-options">
+        <label class="checkbox-label">
+          <input type="checkbox" name="remember" id="remember">
+          <span class="checkbox-custom"></span>
+          Se souvenir de moi
+        </label>
+        <a href="/forgot-password" class="forgot-link">Mot de passe oublié ?</a>
+      </div>
+ 
+      <!-- Bouton soumettre -->
+      <button type="submit" class="btn-login" id="btnLogin">
+        <span class="btn-login-text">Se connecter</span>
+        <span class="btn-login-jp"></span>
+        <span class="btn-login-spinner" id="loginSpinner" style="display:none">⟳</span>
+      </button>
+ 
+    </form>
+ 
+    <!-- Séparateur -->
+    <div class="login-sep">
+      <span></span>
+      <span class="sep-text">ou</span>
+      <span></span>
+    </div>
+ 
+    <!-- Lien inscription -->
+    <p class="register-link">
+      Pas encore de compte ?
+      <a href="/register">Créer un compte</a>
+    </p>
+ 
+    <!-- Retour au forum -->
+    <a href="index.html" class="back-link">← Retour au forum</a>
+ 
+  </div>
+</div>
+ 
+<!-- ═══════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════ -->
+<footer>
+  <span class="footer-jp">Cookime</span>
+  &copy; 2025 Cookime — Tous droits réservés &nbsp;|&nbsp;
+  Connexion sécurisée via Supabase Auth 🔐
+</footer>
+ 
+<!-- ═══════════════════════════════════════════
+     JS — validation côté client (légère)
+════════════════════════════════════════════ -->
+<script>
+  // Afficher/cacher mot de passe
+  document.getElementById('togglePwd').addEventListener('click', function () {
+    const input = document.getElementById('password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    this.textContent = input.type === 'password' ? '👁' : '🙈';
+  });
+ 
+  // Validation légère avant envoi + spinner
+  document.getElementById('loginForm').addEventListener('submit', function (e) {
+    let valid = true;
+ 
+    const email = document.getElementById('email');
+    const pwd   = document.getElementById('password');
+    const emailErr = document.getElementById('emailError');
+    const pwdErr   = document.getElementById('pwdError');
+ 
+    emailErr.textContent = '';
+    pwdErr.textContent   = '';
+ 
+    if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+      emailErr.textContent = 'Adresse e-mail invalide.';
+      email.closest('.field-wrap').classList.add('has-error');
+      valid = false;
+    } else {
+      email.closest('.field-wrap').classList.remove('has-error');
+    }
+ 
+    if (!pwd.value || pwd.value.length < 6) {
+      pwdErr.textContent = 'Le mot de passe doit comporter au moins 6 caractères.';
+      pwd.closest('.field-wrap').classList.add('has-error');
+      valid = false;
+    } else {
+      pwd.closest('.field-wrap').classList.remove('has-error');
+    }
+ 
+    if (!valid) {
+      e.preventDefault();
+      return;
+    }
+ 
+    // Spinner
+    document.getElementById('loginSpinner').style.display = 'inline-block';
+    document.querySelector('.btn-login-text').style.opacity = '0';
+    document.querySelector('.btn-login-jp').style.opacity  = '0';
+    document.getElementById('btnLogin').disabled = true;
+  });
+ 
+  // Lire un éventuel paramètre ?error=1 renvoyé par Go après un échec
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('error') === '1') {
+    document.getElementById('alertError').style.display = 'flex';
+    document.getElementById('alertMsg').textContent = 'Email ou mot de passe incorrect.';
+  }
+  if (params.get('success') === '1') {
+    document.getElementById('alertSuccess').style.display = 'flex';
+  }
+</script>
+ 
+</body>
+</html>
