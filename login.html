@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cookime — Connexion</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="login.css">
 </head>
 <body class="login-page">
  
@@ -32,6 +31,8 @@
   <ul>
     <li><a href="index.html">Accueil</a></li>
     <li><a href="login.html" class="active">Connexion</a></li>
+    <li><a href="posts.html">Posts</a></li>
+    <li><a href="account.html">Mon compte</a></li>
   </ul>
 </nav>
  
@@ -80,10 +81,10 @@
     </div>
  
     <!--
-      ACTION pointe vers le handler Go : POST /login
-      Le backend Go vérifie les credentials via Supabase
+      Login géré côté client via JavaScript / Supabase.
+      Remplacez SUPABASE_URL et SUPABASE_ANON_KEY dans db.js.
     -->
-    <form class="login-form" id="loginForm" method="POST" action="/login" novalidate>
+    <form class="login-form" id="loginForm" method="POST" novalidate>
  
       <!-- Champ email -->
       <div class="field-group">
@@ -159,7 +160,7 @@
     <!-- Lien inscription -->
     <p class="register-link">
       Pas encore de compte ?
-      <a href="/register">Créer un compte</a>
+      <a href="/register.html">Créer un compte</a>
     </p>
  
     <!-- Retour au forum -->
@@ -177,67 +178,9 @@
   Connexion sécurisée via Supabase Auth 🔐
 </footer>
  
-<!-- ═══════════════════════════════════════════
-     JS — validation côté client (légère)
-════════════════════════════════════════════ -->
-<script>
-  // Afficher/cacher mot de passe
-  document.getElementById('togglePwd').addEventListener('click', function () {
-    const input = document.getElementById('password');
-    input.type = input.type === 'password' ? 'text' : 'password';
-    this.textContent = input.type === 'password' ? '👁' : '🙈';
-  });
- 
-  // Validation légère avant envoi + spinner
-  document.getElementById('loginForm').addEventListener('submit', function (e) {
-    let valid = true;
- 
-    const email = document.getElementById('email');
-    const pwd   = document.getElementById('password');
-    const emailErr = document.getElementById('emailError');
-    const pwdErr   = document.getElementById('pwdError');
- 
-    emailErr.textContent = '';
-    pwdErr.textContent   = '';
- 
-    if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-      emailErr.textContent = 'Adresse e-mail invalide.';
-      email.closest('.field-wrap').classList.add('has-error');
-      valid = false;
-    } else {
-      email.closest('.field-wrap').classList.remove('has-error');
-    }
- 
-    if (!pwd.value || pwd.value.length < 6) {
-      pwdErr.textContent = 'Le mot de passe doit comporter au moins 6 caractères.';
-      pwd.closest('.field-wrap').classList.add('has-error');
-      valid = false;
-    } else {
-      pwd.closest('.field-wrap').classList.remove('has-error');
-    }
- 
-    if (!valid) {
-      e.preventDefault();
-      return;
-    }
- 
-    // Spinner
-    document.getElementById('loginSpinner').style.display = 'inline-block';
-    document.querySelector('.btn-login-text').style.opacity = '0';
-    document.querySelector('.btn-login-jp').style.opacity  = '0';
-    document.getElementById('btnLogin').disabled = true;
-  });
- 
-  // Lire un éventuel paramètre ?error=1 renvoyé par Go après un échec
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('error') === '1') {
-    document.getElementById('alertError').style.display = 'flex';
-    document.getElementById('alertMsg').textContent = 'Email ou mot de passe incorrect.';
-  }
-  if (params.get('success') === '1') {
-    document.getElementById('alertSuccess').style.display = 'flex';
-  }
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+<script src="db.js"></script>
+<script src="script.js"></script>
  
 </body>
 </html>

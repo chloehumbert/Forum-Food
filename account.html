@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookime — Mon compte</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="site-logo">
+      <span class="jp-title">Cookime</span>
+      <span class="fr-subtitle">Cookime — Forum de recettes et d'échanges</span>
+    </a>
+    <div class="header-stamp">
+      <span>☀</span>
+      <span>nippon</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="login.html">Connexion</a></li>
+    <li><a href="posts.html">Posts</a></li>
+    <li><a href="account.html" class="active">Mon compte</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+  <main>
+    <section class="account-card">
+      <div class="account-header">
+        <div class="account-avatar">C</div>
+        <div class="account-meta">
+          <div class="name">Votre nom</div>
+          <div class="email">votre@exemple.com</div>
+          <div class="account-actions">
+            <a href="/dashboard" class="btn-edit">Tableau de bord</a>
+            <a href="/logout" class="btn-logout">Se déconnecter</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="account-section">
+        <h3>Modifier les informations</h3>
+        <form method="POST" action="/account-update">
+          <div class="field">
+            <label for="display_name">Nom affiché</label>
+            <input id="display_name" name="display_name" type="text" placeholder="Pseudo ou nom affiché">
+          </div>
+          <div class="field">
+            <label for="email">Adresse e-mail</label>
+            <input id="email" name="email" type="email" placeholder="vous@exemple.com">
+          </div>
+          <div class="field">
+            <label for="password">Nouveau mot de passe</label>
+            <input id="password" name="password" type="password" placeholder="Laisser vide pour garder le mot de passe">
+          </div>
+          <div style="margin-top:12px;">
+            <button type="submit" class="btn-edit">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <aside class="sidebar">
+    <div class="sidebar-widget">
+      <div class="widget-header">🍽️ À propos</div>
+      <div class="widget-body">
+        <p>Gérez votre profil, modifiez votre nom d'affichage et changez votre mot de passe.</p>
+      </div>
+    </div>
+    <div class="sidebar-widget">
+      <div class="widget-header">🛡️ Sécurité</div>
+      <div class="widget-body">
+        <p>Pour plus de sécurité, utilisez un mot de passe unique et activez HTTPS en production.</p>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <span class="footer-jp">Cookime</span>
+  &copy; 2026 Cookime — Forum de recettes et d'échanges culinaires
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>

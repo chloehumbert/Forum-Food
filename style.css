@@ -1157,3 +1157,55 @@ body.login-page footer {
     padding: 28px 24px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════
+   POSTS — styles extraits de posts.html
+════════════════════════════════════════════════════════ */
+
+.post-panel {
+  background: var(--shiro);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-warm);
+  border: 1px solid rgba(200,117,58,.15);
+  padding: 22px;
+  margin-bottom: 24px;
+}
+.post-panel h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.15rem;
+  color: var(--sumi);
+  margin-bottom: 12px;
+}
+.post-panel label { display:block; font-size:.82rem; font-weight:700; color:var(--sumi); margin-bottom:8px; }
+.post-panel input, .post-panel textarea {
+  width:100%; border:1px solid rgba(200,117,58,.25); border-radius:12px; padding:14px 16px; font-family:'Zen Maru Gothic',sans-serif; font-size:.95rem; color:var(--sumi); background:var(--shiro2); margin-bottom:16px; resize:vertical;
+}
+.post-panel button { display:inline-flex; align-items:center; justify-content:center; padding:12px 20px; border:none; border-radius:999px; background:linear-gradient(135deg,var(--akane),var(--kaki)); color:white; font-weight:700; cursor:pointer; transition:transform .18s, box-shadow .18s; }
+.post-panel button:hover { transform:translateY(-1px); box-shadow:0 12px 20px rgba(217,79,61,.18); }
+
+.post-card { background:var(--shiro); border-radius:var(--r); box-shadow:var(--shadow-warm); border:1px solid rgba(200,117,58,.15); overflow:hidden; margin-bottom:18px; }
+.post-card-header { padding:16px 18px; background:linear-gradient(90deg,var(--akane),var(--kaki)); color:var(--shiro); display:flex; align-items:center; gap:12px; }
+.post-card-header .avatar { width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,.35); display:flex; align-items:center; justify-content:center; font-weight:900; color:var(--sumi); background:linear-gradient(135deg, rgba(255,255,255,.45), rgba(255,255,255,.15)); }
+.post-card-title { font-family:'Shippori Mincho', serif; font-size:1rem; font-weight:800; line-height:1.2; margin-bottom:4px; }
+.post-card-meta { font-size:.78rem; color:rgba(255,255,255,.85); letter-spacing:.04em; }
+.post-card-body { padding:18px; color:var(--cha); line-height:1.75; font-size:.92rem; }
+.empty-feed { padding:20px; font-size:.92rem; color:var(--cha); }
+
+/* ═══════════════════════════════════════════════════════
+   ACCOUNT — styles extraits de account.html
+════════════════════════════════════════════════════════ */
+
+.account-card { max-width:800px; margin:36px auto; padding:20px; background:var(--shiro); border-radius:var(--r); box-shadow:var(--shadow-warm); border:1px solid rgba(200,117,58,.12); }
+.account-header { display:flex; gap:18px; align-items:center; margin-bottom:18px; }
+.account-avatar { width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,var(--akane),var(--kaki)); display:flex; align-items:center; justify-content:center; color:var(--shiro); font-weight:900; font-size:1.6rem; }
+.account-meta { font-family:'Shippori Mincho', serif; color:var(--sumi); }
+.account-meta .name { font-size:1.1rem; font-weight:800; }
+.account-meta .email { font-size:.9rem; color:var(--cha); }
+.account-actions { display:flex; gap:12px; margin-top:12px; }
+.account-actions a, .account-actions button { text-decoration:none; padding:10px 16px; border-radius:10px; border:none; cursor:pointer; font-weight:700; }
+.btn-edit { background:linear-gradient(135deg,var(--akane),var(--kaki)); color:#fff; }
+.btn-logout { background:transparent; color:var(--sumi); border:1px solid rgba(200,117,58,.12); }
+.account-section { margin-top:20px; }
+.field { display:block; margin-bottom:12px; }
+.field label { display:block; font-weight:700; margin-bottom:6px; }
+.field input { width:100%; padding:12px; border-radius:10px; border:1px solid rgba(200,117,58,.12); background:var(--shiro2); }

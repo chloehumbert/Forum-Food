@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookime — Créer un compte</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-page">
+<header>
+  <div class="header-inner">
+    <a href="/" class="site-logo">
+      <span class="jp-title">Cookime</span>
+      <span class="fr-subtitle">Forum de recettes</span>
+    </a>
+    <div class="header-stamp">
+      <span>☀</span>
+      <span>nippon</span>
+    </div>
+  </div>
+</header>
+<nav>
+  <ul>
+    <li><a href="/">Accueil</a></li>
+    <li><a href="/login.html">Connexion</a></li>
+    <li><a href="/register.html" class="active">Créer un compte</a></li>
+  </ul>
+</nav>
+<div class="login-wrapper">
+  <div class="login-deco" aria-hidden="true">
+    <div class="deco-kanji"></div>
+    <div class="deco-lines"><span></span><span></span><span></span></div>
+    <ul class="deco-facts">
+      <li><span class="fact-jp">新しい</span><span class="fact-fr">Nouveau</span></li>
+      <li><span class="fact-jp">アカウント</span><span class="fact-fr">Compte</span></li>
+      <li><span class="fact-jp">始めましょう</span><span class="fact-fr">C'est parti</span></li>
+    </ul>
+    <div class="deco-torii">⛩️</div>
+  </div>
+  <div class="login-card">
+    <div class="login-card-top">
+      <div class="login-avatar-ring"><span></span></div>
+      <h1 class="login-title">
+        <span class="login-title-jp">登録</span>
+        <span class="login-title-fr">Créer un compte</span>
+      </h1>
+    </div>
+    <div class="login-alert login-alert--error" id="alertError" hidden>
+      <span class="alert-icon">⚠</span>
+      <span id="alertMsg">Erreur lors de l'inscription.</span>
+    </div>
+    <div class="login-alert login-alert--success" id="alertSuccess" hidden>
+      <span class="alert-icon">✓</span>
+      <span id="successMsg">Compte créé avec succès ! Vérifiez votre e-mail.</span>
+    </div>
+    <form class="login-form" id="registerForm" action="#" novalidate>
+      <div class="field-group">
+        <label for="email" class="field-label">
+          <span class="field-label-jp">メール</span>
+          Adresse e-mail
+        </label>
+        <div class="field-wrap">
+          <span class="field-icon">✉</span>
+          <input type="email" id="email" class="field-input" placeholder="vous@exemple.com" autocomplete="email" required>
+        </div>
+        <span class="field-error" id="emailError"></span>
+      </div>
+      <div class="field-group">
+        <label for="password" class="field-label">
+          <span class="field-label-jp">パスワード</span>
+          Mot de passe
+        </label>
+        <div class="field-wrap">
+          <span class="field-icon">🔑</span>
+          <input type="password" id="password" class="field-input" placeholder="••••••••" autocomplete="new-password" required>
+        </div>
+        <span class="field-error" id="pwdError"></span>
+      </div>
+      <div class="field-group">
+        <label for="confirmPassword" class="field-label">
+          <span class="field-label-jp">確認</span>
+          Confirmer le mot de passe
+        </label>
+        <div class="field-wrap">
+          <span class="field-icon">🔒</span>
+          <input type="password" id="confirmPassword" class="field-input" placeholder="••••••••" autocomplete="new-password" required>
+        </div>
+        <span class="field-error" id="confirmError"></span>
+      </div>
+      <button type="submit" class="btn-login" id="btnRegister">
+        <span class="btn-login-text">Créer mon compte</span>
+        <span class="btn-login-jp"></span>
+        <span class="btn-login-spinner" id="registerSpinner" hidden>⟳</span>
+      </button>
+    </form>
+    <div class="login-sep"><span></span><span class="sep-text">ou</span><span></span></div>
+    <p class="register-link">Vous avez déjà un compte ? <a href="/login.html">Se connecter</a></p>
+    <a href="/" class="back-link">← Retour au forum</a>
+  </div>
+</div>
+<footer>
+  <span class="footer-jp">Cookime</span>
+  &copy; 2025 Cookime — Tous droits réservés &nbsp;|&nbsp; Connexion via Supabase Auth
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+<script src="db.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

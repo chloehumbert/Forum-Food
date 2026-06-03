@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookime — Posts</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+ 
+<!-- ═══════════════════════════════════════════
+     HEADER
+════════════════════════════════════════════ -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="site-logo">
+      <span class="jp-title">Cookime</span>
+      <span class="fr-subtitle">Cookime — Forum de recettes et d'échanges</span>
+    </a>
+    <div class="header-stamp">
+      <span>☀</span>
+      <span>nippon</span>
+    </div>
+  </div>
+</header>
+ 
+<!-- ═══════════════════════════════════════════
+     NAVIGATION
+════════════════════════════════════════════ -->
+<nav>
+  <ul>
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="login.html">Connexion</a></li>
+    <li><a href="posts.html" class="active">Posts</a></li>
+    <li><a href="account.html">Mon compte</a></li>
+  </ul>
+</nav>
+ 
+<!-- ═══════════════════════════════════════════
+     CONTENU PRINCIPAL
+════════════════════════════════════════════ -->
+<div class="page-wrap">
+  <main>
+    <article class="hero-post">
+      <div class="hero-post-banner">
+        <span class="pin-badge">📌 Forum</span>
+      </div>
+      <div class="hero-post-body">
+        <h2>Partagez vos idées et recettes avec la communauté</h2>
+        <p>
+          Publiez un message, une astuce ou une question : votre contribution apparaît immédiatement
+          sur le site sans attendre. C'est le bon endroit pour faire vivre Cookime.
+        </p>
+      </div>
+      <div class="hero-post-footer">
+        <div class="avatar">C</div>
+        <div>
+          <div class="post-author">Équipe Cookime</div>
+          <div class="post-date">Forum ouvert</div>
+        </div>
+        <div class="post-stats">
+          <span>💬 0 nouvelles publications</span>
+        </div>
+      </div>
+    </article>
+
+    <section class="post-panel">
+      <h2>Publier un message</h2>
+      <form id="post-form">
+        <label for="author">Nom</label>
+        <input type="text" id="author" name="author" placeholder="Votre nom ou pseudo" required>
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="5" placeholder="Écrivez votre recette, votre conseil ou votre question..." required></textarea>
+
+        <button type="submit">Publier</button>
+      </form>
+    </section>
+
+    <section class="forum-category">
+      <div class="category-header">
+        <span class="icon">📝</span>
+        <h3>Fil de discussion</h3>
+        <span class="jp">投稿</span>
+      </div>
+      <div id="posts-feed" class="post-list">
+        <div class="empty-feed">Aucune publication pour le moment. Écrivez un message pour le voir apparaître ici.</div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="sidebar">
+    <div class="sidebar-widget">
+      <div class="widget-header">🍽️ À propos</div>
+      <div class="widget-body">
+        <p>
+          Ici, chaque message publié par un visiteur apparaît instantanément. Le forum est conçu pour
+          favoriser le partage des recettes et des astuces de cuisine.
+        </p>
+      </div>
+    </div>
+
+    <div class="sidebar-widget">
+      <div class="widget-header">🛠️ Comment ça marche</div>
+      <div class="widget-body">
+        <ul class="info-list">
+          <li>Entrez un nom</li>
+          <li>Rédigez votre message</li>
+          <li>Cliquez sur Publier</li>
+          <li>Le post apparaît immédiatement</li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <span class="footer-jp">Cookime</span>
+  &copy; 2026 Cookime — Forum de recettes et d'échanges culinaires
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
+ 
