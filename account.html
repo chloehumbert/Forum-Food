@@ -15,8 +15,7 @@
       <span class="fr-subtitle">Cookime — Forum de recettes et d'échanges</span>
     </a>
     <div class="header-stamp">
-      <span>☀</span>
-      <span>nippon</span>
+      <img src="logo.jpg" alt="Logo Cookime" class="header-logo">
     </div>
   </div>
 </header>
@@ -24,8 +23,8 @@
 <nav>
   <ul>
     <li><a href="index.html">Accueil</a></li>
-    <li><a href="login.html">Connexion</a></li>
     <li><a href="posts.html">Posts</a></li>
+    <li><a href="login.html">Connexion</a></li>
     <li><a href="account.html" class="active">Mon compte</a></li>
   </ul>
 </nav>
@@ -40,7 +39,7 @@
           <div class="email">votre@exemple.com</div>
           <div class="account-actions">
             <a href="/dashboard" class="btn-edit">Tableau de bord</a>
-            <a href="/logout" class="btn-logout">Se déconnecter</a>
+            <a href="logout.html" class="btn-logout">Se déconnecter</a>
           </div>
         </div>
       </div>
@@ -89,6 +88,8 @@
   &copy; 2026 Cookime — Forum de recettes et d'échanges culinaires
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+<script src="db.js"></script>
 <script src="script.js"></script>
 
 </body>

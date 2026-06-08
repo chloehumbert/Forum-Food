@@ -131,6 +131,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const registerForm = document.getElementById('registerForm');
   if (registerForm) {
+    // Helpers to centralize alert visibility
+    function hideAlerts() {
+      const err = document.getElementById('alertError');
+      const suc = document.getElementById('alertSuccess');
+      if (err) { err.style.display = 'none'; }
+      if (suc) { suc.style.display = 'none'; }
+    }
+    function showError(msg) {
+      hideAlerts();
+      const err = document.getElementById('alertError');
+      const alertMsg = document.getElementById('alertMsg');
+      if (err) { err.style.display = 'flex'; }
+      if (alertMsg) { alertMsg.textContent = msg; }
+    }
+    function showSuccess(msg) {
+      hideAlerts();
+      const suc = document.getElementById('alertSuccess');
+      const successMsg = document.getElementById('successMsg');
+      if (suc) { suc.style.display = 'flex'; }
+      if (successMsg) { successMsg.textContent = msg; }
+    }
+
+    // Ensure alerts hidden initially
+    hideAlerts();
+
     registerForm.addEventListener('submit', async function (e) {
       e.preventDefault();
       let valid = true;
@@ -140,14 +165,11 @@ document.addEventListener('DOMContentLoaded', function () {
       const emailErr = document.getElementById('emailError');
       const pwdErr = document.getElementById('pwdError');
       const confirmErr = document.getElementById('confirmError');
-      const alertError = document.getElementById('alertError');
-      const alertSuccess = document.getElementById('alertSuccess');
 
       if (emailErr) emailErr.textContent = '';
       if (pwdErr) pwdErr.textContent = '';
       if (confirmErr) confirmErr.textContent = '';
-      if (alertError) alertError.style.display = 'none';
-      if (alertSuccess) alertSuccess.style.display = 'none';
+      hideAlerts();
 
       if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
         if (emailErr) emailErr.textContent = 'Adresse e-mail invalide.';
@@ -165,10 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!valid) { return; }
 
       if (!window.supabase || !window.supabase.createClient) {
-        if (alertError) {
-          alertError.style.display = 'flex';
-          document.getElementById('alertMsg').textContent = 'Supabase non configuré.';
-        }
+        showError('Supabase non configuré.');
         return;
       }
 
@@ -179,19 +198,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const { user, error } = await registerSupabase(email.value.trim(), pwd.value);
       if (error || !user) {
-        if (alertError) {
-          alertError.style.display = 'flex';
-          document.getElementById('alertMsg').textContent = error?.message || 'Erreur lors de l’inscription.';
-        }
+        showError(error?.message || 'Erreur lors de l’inscription.');
         if (spinner) spinner.hidden = true;
         if (btnText) btnText.style.opacity = '1';
         return;
       }
 
-      if (alertSuccess) {
-        alertSuccess.style.display = 'flex';
-        document.getElementById('successMsg').textContent = 'Compte créé avec succès, la BDD répond correctement.';
-      }
+      showSuccess('Compte créé avec succès, la BDD répond correctement.');
       if (spinner) spinner.hidden = true;
       if (btnText) btnText.style.opacity = '1';
     });
@@ -208,5 +221,41 @@ document.addEventListener('DOMContentLoaded', function () {
   if (params.get('success') === '1') {
     const alertSuccess = document.getElementById('alertSuccess');
     if (alertSuccess) alertSuccess.style.display = 'flex';
+  }
+
+  // --- Account page: récupérer et afficher les informations utilisateur ---
+  const accountCard = document.querySelector('.account-card');
+  if (accountCard) {
+    (async () => {
+      const nameEl = document.querySelector('.account-meta .name');
+      const emailEl = document.querySelector('.account-meta .email');
+      const inputName = document.getElementById('display_name');
+      const inputEmail = document.getElementById('email');
+
+      let stored = localStorage.getItem('cookimeUser');
+      if (!stored) {
+        if (nameEl) nameEl.textContent = 'Visiteur';
+        return;
+      }
+
+      let userObj;
+      try { userObj = JSON.parse(stored); } catch (e) { userObj = null; }
+      if (!userObj) return;
+
+      let result;
+      if (userObj.id && window.getUserById) {
+        result = await window.getUserById(userObj.id);
+      } else if (userObj.email && window.getUserByEmail) {
+        result = await window.getUserByEmail(userObj.email);
+      }
+
+      const user = result?.user || userObj;
+      if (user) {
+        if (nameEl) nameEl.textContent = user.username || 'Utilisateur';
+        if (emailEl) emailEl.textContent = user.email || '';
+        if (inputName) inputName.value = user.username || '';
+        if (inputEmail) inputEmail.value = user.email || '';
+      }
+    })();
   }
 });

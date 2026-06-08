@@ -129,11 +129,13 @@ header::after {
   flex-shrink: 0;
 }
 
-.header-stamp span {
-  font-size: .55rem;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  opacity: .85;
+.header-stamp img.header-logo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin-top: 3px;
 }
 
 /* ───────────────────────────────────────────
