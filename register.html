@@ -7,25 +7,28 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="login-page">
+
 <header>
   <div class="header-inner">
     <a href="/" class="site-logo">
       <span class="jp-title">Cookime</span>
-      <span class="fr-subtitle">Forum de recettes</span>
+      <span class="fr-subtitle">Forum de partage de recettes</span>
     </a>
     <div class="header-stamp">
       <img src="logo.jpg" alt="Logo Cookime" class="header-logo">
     </div>
   </div>
 </header>
+
 <nav>
   <ul>
     <li><a href="/">Accueil</a></li>
-    <li><a href="/login.html">Connexion</a></li>
-    <li><a href="/register.html" class="active">Créer un compte</a></li>
+    <li><a href="/login">Connexion</a></li>
   </ul>
 </nav>
+
 <div class="login-wrapper">
+<<<<<<< HEAD
   <div class="login-deco" aria-hidden="true">
     <div class="deco-kanji"></div>
     <div class="deco-lines"><span></span><span></span><span></span></div>
@@ -36,6 +39,8 @@
     </ul>
     <div class="deco-torii">⛩️</div>
   </div>
+=======
+>>>>>>> 5e8c89850c6fdea1678fdf455ae9408651113698
   <div class="login-card">
     <div class="login-card-top">
       <div class="login-avatar-ring"><span></span></div>
@@ -43,62 +48,84 @@
         <span class="login-title-fr">Créer un compte</span>
       </h1>
     </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5e8c89850c6fdea1678fdf455ae9408651113698
     <div class="login-alert login-alert--error" id="alertError" style="display:none">
       <span class="alert-icon">⚠</span>
-      <span id="alertMsg">Erreur lors de l'inscription.</span>
+      <span id="alertMsg">Une erreur est survenue, vérifiez le formulaire.</span>
     </div>
+<<<<<<< HEAD
     <div class="login-alert login-alert--success" id="alertSuccess" style="display:none">
       <span class="alert-icon">✓</span>
       <span id="successMsg">Compte créé avec succès ! Vérifiez votre e-mail.</span>
     </div>
     <form class="login-form" id="registerForm" action="#" novalidate>
+=======
+
+    <form class="login-form" method="POST" action="/register" novalidate>
+>>>>>>> 5e8c89850c6fdea1678fdf455ae9408651113698
       <div class="field-group">
         <label for="email" class="field-label">
           Adresse e-mail
         </label>
         <div class="field-wrap">
           <span class="field-icon">✉</span>
-          <input type="email" id="email" class="field-input" placeholder="vous@exemple.com" autocomplete="email" required>
+          <input type="email" id="email" name="email" class="field-input" placeholder="vous@exemple.com" autocomplete="email" required>
         </div>
-        <span class="field-error" id="emailError"></span>
       </div>
+
       <div class="field-group">
         <label for="password" class="field-label">
           Mot de passe
         </label>
         <div class="field-wrap">
           <span class="field-icon">🔑</span>
-          <input type="password" id="password" class="field-input" placeholder="••••••••" autocomplete="new-password" required>
+          <input type="password" id="password" name="password" class="field-input" placeholder="••••••••" autocomplete="new-password" required>
         </div>
-        <span class="field-error" id="pwdError"></span>
       </div>
+
       <div class="field-group">
+<<<<<<< HEAD
         <label for="confirmPassword" class="field-label">
           Confirmer le mot de passe
+=======
+        <label for="confirm" class="field-label">
+          <span class="field-label-jp">確認</span>
+          Confirmation du mot de passe
+>>>>>>> 5e8c89850c6fdea1678fdf455ae9408651113698
         </label>
         <div class="field-wrap">
-          <span class="field-icon">🔒</span>
-          <input type="password" id="confirmPassword" class="field-input" placeholder="••••••••" autocomplete="new-password" required>
+          <span class="field-icon">🔁</span>
+          <input type="password" id="confirm" name="confirm" class="field-input" placeholder="••••••••" autocomplete="new-password" required>
         </div>
-        <span class="field-error" id="confirmError"></span>
       </div>
+
       <button type="submit" class="btn-login" id="btnRegister">
-        <span class="btn-login-text">Créer mon compte</span>
-        <span class="btn-login-jp"></span>
-        <span class="btn-login-spinner" id="registerSpinner" hidden>⟳</span>
+        <span class="btn-login-text">Créer un compte</span>
       </button>
     </form>
-    <div class="login-sep"><span></span><span class="sep-text">ou</span><span></span></div>
-    <p class="register-link">Vous avez déjà un compte ? <a href="/login.html">Se connecter</a></p>
+
+    <div class="login-sep">
+      <span></span>
+      <span class="sep-text">ou</span>
+      <span></span>
+    </div>
+
+    <p class="register-link">
+      Déjà inscrit ?
+      <a href="/login">Se connecter</a>
+    </p>
+
     <a href="/" class="back-link">← Retour au forum</a>
   </div>
 </div>
+
 <footer>
   <span class="footer-jp">Cookime</span>
-  &copy; 2025 Cookime — Tous droits réservés &nbsp;|&nbsp; Connexion via Supabase Auth
+  &copy; 2025 Cookime — Tous droits réservés
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
-<script src="db.js"></script>
-<script src="script.js"></script>
+
 </body>
 </html>
