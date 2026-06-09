@@ -64,9 +64,25 @@
 
     <section class="post-panel">
       <h2>Publier un message</h2>
-      <form id="post-form">
-        <label for="message">Message</label>
-        <textarea id="message" name="message" rows="5" placeholder="Écrivez votre recette, votre conseil ou votre question..." required></textarea>
+      <form id="post-form" novalidate>
+        <label for="title">Titre du post</label>
+        <input id="title" name="title" type="text" placeholder="Ex. Recette de pancakes maison" required>
+
+        <label for="category">Catégorie</label>
+        <select id="category" name="category" required>
+          <option value="">Choisir une catégorie</option>
+          <option value="entrée">Entrée</option>
+          <option value="plat">Plat</option>
+          <option value="dessert">Dessert</option>
+        </select>
+
+        <label for="content">Message</label>
+        <textarea id="content" name="content" rows="5" placeholder="Écrivez votre recette, votre conseil ou votre question..." required></textarea>
+
+        <label for="image">Image (optionnelle)</label>
+        <input id="image" name="image" type="file" accept="image/*">
+
+        <p id="postStatus" class="login-alert" style="display:none"></p>
 
         <button type="submit">Publier</button>
       </form>
@@ -113,6 +129,8 @@
   &copy; 2026 Cookime — Forum de recettes et d'échanges culinaires
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+<script src="db.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
