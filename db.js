@@ -65,6 +65,44 @@ async function getUserByEmail(email) {
   return { user: data, error };
 }
 
+async function createPost(postData) {
+  if (!postData || !postData.user_id) {
+    return { data: null, error: { message: 'Vous devez être connecté pour publier.' } };
+  }
+
+  const payload = {
+    user_id: postData.user_id,
+    title: (postData.title || '').trim(),
+    content: (postData.content || '').trim(),
+    date: postData.date || new Date().toISOString().slice(0, 10),
+    author: (postData.author || '').trim() || 'Utilisateur',
+    category: (postData.category || '').trim(),
+    created_at: postData.created_at || new Date().toISOString(),
+    image_url: postData.image_url || null,
+  };
+
+  if (!payload.title || !payload.content || !payload.category) {
+    return { data: null, error: { message: 'Titre, contenu et catégorie sont requis.' } };
+  }
+
+  const { data, error } = await supabaseClient
+    .from('posts')
+    .insert([payload])
+    .select('*')
+    .single();
+
+  return { data, error };
+}
+
+async function getPosts() {
+  const { data, error } = await supabaseClient
+    .from('posts')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  return { data, error };
+}
+
 async function updateUserProfile(userId, updates) {
   if (!userId) {
     return { user: null, error: { message: 'Utilisateur non identifié.' } };
@@ -123,4 +161,6 @@ async function updateUserProfile(userId, updates) {
 window.getUserById = getUserById;
 window.getUserByEmail = getUserByEmail;
 window.updateUserProfile = updateUserProfile;
+window.createPost = createPost;
+window.getPosts = getPosts;
 window.supabaseClient = supabaseClient;

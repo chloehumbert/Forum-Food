@@ -1,51 +1,174 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // --- Posts preview (only if posts form exists) ---
+  // --- Posts page: create and load posts in Supabase ---
   const postForm = document.getElementById('post-form');
   if (postForm) {
+    const STORAGE_BUCKET = 'cookime-image-posts';
     const feed = document.getElementById('posts-feed');
     const emptyMessage = document.querySelector('.empty-feed');
+    const statusBox = document.getElementById('postStatus');
+
+    function showStatus(message, type) {
+      if (!statusBox) return;
+      statusBox.textContent = message;
+      statusBox.className = type === 'success' ? 'login-alert login-alert--success' : 'login-alert login-alert--error';
+      statusBox.style.display = 'block';
+    }
 
     function formatTime(date) {
-      return date.toLocaleString('fr-FR', {
+      const value = date ? new Date(date) : new Date();
+      return value.toLocaleString('fr-FR', {
         day: '2-digit', month: '2-digit', year: 'numeric',
         hour: '2-digit', minute: '2-digit'
       });
     }
 
-    function createPostCard(author, message) {
-      const card = document.createElement('div');
+    function createPostCard(post) {
+      const card = document.createElement('article');
       card.className = 'post-card';
 
       const header = document.createElement('div');
       header.className = 'post-card-header';
       header.innerHTML = `
-        <div class="avatar">${author.charAt(0).toUpperCase()}</div>
+        <div class="avatar">${(post.author || 'U').charAt(0).toUpperCase()}</div>
         <div>
-          <div class="post-card-title">${author}</div>
-          <div class="post-card-meta">Publié le ${formatTime(new Date())}</div>
+          <div class="post-card-title">${post.title || 'Post'}</div>
+          <div class="post-card-meta">Par ${post.author || 'Utilisateur'} • ${post.category || ''} • ${formatTime(post.created_at || post.date)}</div>
         </div>
       `;
 
       const body = document.createElement('div');
       body.className = 'post-card-body';
-      body.textContent = message;
+      body.textContent = post.content || '';
 
       card.appendChild(header);
       card.appendChild(body);
+
+      if (post.image_url) {
+        const image = document.createElement('img');
+        image.src = post.image_url;
+        image.alt = post.title || 'Image du post';
+        image.style.maxWidth = '100%';
+        image.style.borderRadius = '10px';
+        image.style.marginTop = '12px';
+        card.appendChild(image);
+      }
+
       return card;
     }
 
-    postForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const author = postForm.author ? postForm.author.value.trim() : '';
-      const message = postForm.message ? postForm.message.value.trim() : '';
-      if (!author || !message) return;
+    function renderPosts(posts) {
+      if (!feed) return;
 
-      const postCard = createPostCard(author, message);
-      if (emptyMessage) { emptyMessage.remove(); }
-      feed.prepend(postCard);
-      postForm.reset();
-      if (postForm.author) postForm.author.focus();
+      feed.innerHTML = '';
+      if (!posts || posts.length === 0) {
+        feed.innerHTML = '<div class="empty-feed">Aucune publication pour le moment. Écrivez un message pour le voir apparaître ici.</div>';
+        return;
+      }
+
+      posts.forEach((post) => feed.appendChild(createPostCard(post)));
+    }
+
+    async function loadPosts() {
+      if (!window.getPosts) return;
+      const { data, error } = await window.getPosts();
+      if (error) {
+        if (statusBox) {
+          showStatus('Impossible de charger les publications.', 'error');
+        }
+        return;
+      }
+      renderPosts(data || []);
+    }
+
+    loadPosts();
+
+    postForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const stored = localStorage.getItem('cookimeUser');
+      let userObj = null;
+      try { userObj = stored ? JSON.parse(stored) : null; } catch (e) { userObj = null; }
+
+      if (!userObj || !userObj.id) {
+        showStatus('Connectez-vous pour publier un post.', 'error');
+        return;
+      }
+
+      const titleInput = document.getElementById('title');
+      const categoryInput = document.getElementById('category');
+      const contentInput = document.getElementById('content');
+      const imageInput = document.getElementById('image');
+
+      const title = titleInput ? titleInput.value.trim() : '';
+      const content = contentInput ? contentInput.value.trim() : '';
+      const category = categoryInput ? categoryInput.value : '';
+
+      if (!title || !content || !category) {
+        showStatus('Le titre, le contenu et la catégorie sont obligatoires.', 'error');
+        return;
+      }
+
+      const submitButton = postForm.querySelector('button[type="submit"]');
+      if (submitButton) submitButton.disabled = true;
+
+      try {
+        let imageUrl = null;
+
+        if (imageInput && imageInput.files && imageInput.files.length > 0) {
+          const file = imageInput.files[0];
+          const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+          const storagePath = `posts/${userObj.id}/${fileName}`;
+
+          const storageClient = window.supabaseClient;
+          if (!storageClient || !storageClient.storage) {
+            showStatus('Le stockage Supabase n’est pas disponible.', 'error');
+            if (submitButton) submitButton.disabled = false;
+            return;
+          }
+
+          const { data: uploadData, error: uploadError } = await storageClient.storage
+            .from(STORAGE_BUCKET)
+            .upload(storagePath, file, { cacheControl: '3600', upsert: false });
+
+          if (uploadError) {
+            const detail = uploadError.message || 'Erreur inconnue';
+            showStatus('Impossible de téléverser l’image : ' + detail + ' (bucket: ' + STORAGE_BUCKET + ')', 'error');
+            if (submitButton) submitButton.disabled = false;
+            return;
+          }
+
+          const { data: publicUrlData } = storageClient.storage
+            .from(STORAGE_BUCKET)
+            .getPublicUrl(uploadData.path);
+
+          imageUrl = publicUrlData?.publicUrl || null;
+        }
+
+        const { data, error } = await window.createPost({
+          user_id: userObj.id,
+          title,
+          content,
+          date: new Date().toISOString().slice(0, 10),
+          author: userObj.username || userObj.email || 'Utilisateur',
+          category,
+          created_at: new Date().toISOString(),
+          image_url: imageUrl,
+        });
+
+        if (error) {
+          showStatus(error.message || 'Erreur lors de la publication.', 'error');
+          if (submitButton) submitButton.disabled = false;
+          return;
+        }
+
+        showStatus('Post publié avec succès.', 'success');
+        postForm.reset();
+        await loadPosts();
+        if (submitButton) submitButton.disabled = false;
+      } catch (err) {
+        showStatus('Une erreur est survenue pendant la publication.', 'error');
+        if (submitButton) submitButton.disabled = false;
+      }
     });
   }
 
