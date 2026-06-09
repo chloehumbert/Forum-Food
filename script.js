@@ -231,10 +231,29 @@ document.addEventListener('DOMContentLoaded', function () {
       const emailEl = document.querySelector('.account-meta .email');
       const inputName = document.getElementById('display_name');
       const inputEmail = document.getElementById('email');
+      const loginLink = document.getElementById('loginLink');
+      const logoutLink = document.getElementById('logoutLink');
+      const accountForm = document.getElementById('accountForm');
+      const accountStatus = document.getElementById('accountStatus');
+
+      let currentUser = null;
 
       let stored = localStorage.getItem('cookimeUser');
+      if (loginLink) {
+        loginLink.hidden = Boolean(stored);
+      }
+      if (logoutLink) {
+        logoutLink.hidden = !stored;
+      }
+
       if (!stored) {
         if (nameEl) nameEl.textContent = 'Visiteur';
+        if (emailEl) emailEl.textContent = 'Connectez-vous pour gérer votre compte.';
+        if (accountStatus) {
+          accountStatus.textContent = 'Vous devez être connecté pour modifier votre profil.';
+          accountStatus.style.display = 'block';
+          accountStatus.className = 'login-alert login-alert--error';
+        }
         return;
       }
 
@@ -249,12 +268,103 @@ document.addEventListener('DOMContentLoaded', function () {
         result = await window.getUserByEmail(userObj.email);
       }
 
-      const user = result?.user || userObj;
-      if (user) {
-        if (nameEl) nameEl.textContent = user.username || 'Utilisateur';
-        if (emailEl) emailEl.textContent = user.email || '';
-        if (inputName) inputName.value = user.username || '';
-        if (inputEmail) inputEmail.value = user.email || '';
+      currentUser = result?.user || userObj;
+      if (currentUser) {
+        if (nameEl) nameEl.textContent = currentUser.username || 'Utilisateur';
+        if (emailEl) emailEl.textContent = currentUser.email || '';
+        if (inputName) inputName.value = currentUser.username || '';
+        if (inputEmail) inputEmail.value = currentUser.email || '';
+      }
+
+      if (accountForm) {
+        accountForm.addEventListener('submit', async function (event) {
+          event.preventDefault();
+
+          if (!currentUser?.id) {
+            if (accountStatus) {
+              accountStatus.textContent = 'Vous devez être connecté pour modifier votre profil.';
+              accountStatus.className = 'login-alert login-alert--error';
+              accountStatus.style.display = 'block';
+            }
+            return;
+          }
+
+          const username = document.getElementById('display_name').value.trim();
+          const email = document.getElementById('email').value.trim().toLowerCase();
+          const password = document.getElementById('newPassword').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+
+          if (!username || !email) {
+            if (accountStatus) {
+              accountStatus.textContent = 'Le nom affiché et l’e-mail sont obligatoires.';
+              accountStatus.className = 'login-alert login-alert--error';
+              accountStatus.style.display = 'block';
+            }
+            return;
+          }
+
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            if (accountStatus) {
+              accountStatus.textContent = 'Veuillez saisir une adresse e-mail valide.';
+              accountStatus.className = 'login-alert login-alert--error';
+              accountStatus.style.display = 'block';
+            }
+            return;
+          }
+
+          if (password && password.length < 6) {
+            if (accountStatus) {
+              accountStatus.textContent = 'Le mot de passe doit contenir au moins 6 caractères.';
+              accountStatus.className = 'login-alert login-alert--error';
+              accountStatus.style.display = 'block';
+            }
+            return;
+          }
+
+          if (password && password !== confirmPassword) {
+            if (accountStatus) {
+              accountStatus.textContent = 'Les mots de passe ne correspondent pas.';
+              accountStatus.className = 'login-alert login-alert--error';
+              accountStatus.style.display = 'block';
+            }
+            return;
+          }
+
+          const submitButton = accountForm.querySelector('button[type="submit"]');
+          if (submitButton) submitButton.disabled = true;
+
+          const { user: updatedUser, error } = await window.updateUserProfile(currentUser.id, {
+            username,
+            email,
+            password: password || undefined,
+          });
+
+          if (submitButton) submitButton.disabled = false;
+
+          if (error) {
+            if (accountStatus) {
+              accountStatus.textContent = error.message || 'Erreur lors de la mise à jour.';
+              accountStatus.className = 'login-alert login-alert--error';
+              accountStatus.style.display = 'block';
+            }
+            return;
+          }
+
+          if (updatedUser) {
+            currentUser = updatedUser;
+            localStorage.setItem('cookimeUser', JSON.stringify(updatedUser));
+            if (nameEl) nameEl.textContent = updatedUser.username || 'Utilisateur';
+            if (emailEl) emailEl.textContent = updatedUser.email || '';
+            if (accountStatus) {
+              accountStatus.textContent = 'Profil mis à jour avec succès.';
+              accountStatus.className = 'login-alert login-alert--success';
+              accountStatus.style.display = 'block';
+            }
+            accountForm.reset();
+            if (inputName) inputName.value = updatedUser.username || '';
+            if (inputEmail) inputEmail.value = updatedUser.email || '';
+          }
+        });
       }
     })();
   }
