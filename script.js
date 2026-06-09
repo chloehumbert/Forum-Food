@@ -1,51 +1,174 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // --- Posts preview (only if posts form exists) ---
+  // --- Posts page: create and load posts in Supabase ---
   const postForm = document.getElementById('post-form');
   if (postForm) {
+    const STORAGE_BUCKET = 'cookime-image-posts';
     const feed = document.getElementById('posts-feed');
     const emptyMessage = document.querySelector('.empty-feed');
+    const statusBox = document.getElementById('postStatus');
+
+    function showStatus(message, type) {
+      if (!statusBox) return;
+      statusBox.textContent = message;
+      statusBox.className = type === 'success' ? 'login-alert login-alert--success' : 'login-alert login-alert--error';
+      statusBox.style.display = 'block';
+    }
 
     function formatTime(date) {
-      return date.toLocaleString('fr-FR', {
+      const value = date ? new Date(date) : new Date();
+      return value.toLocaleString('fr-FR', {
         day: '2-digit', month: '2-digit', year: 'numeric',
         hour: '2-digit', minute: '2-digit'
       });
     }
 
-    function createPostCard(author, message) {
-      const card = document.createElement('div');
+    function createPostCard(post) {
+      const card = document.createElement('article');
       card.className = 'post-card';
 
       const header = document.createElement('div');
       header.className = 'post-card-header';
       header.innerHTML = `
-        <div class="avatar">${author.charAt(0).toUpperCase()}</div>
+        <div class="avatar">${(post.author || 'U').charAt(0).toUpperCase()}</div>
         <div>
-          <div class="post-card-title">${author}</div>
-          <div class="post-card-meta">Publié le ${formatTime(new Date())}</div>
+          <div class="post-card-title">${post.title || 'Post'}</div>
+          <div class="post-card-meta">Par ${post.author || 'Utilisateur'} • ${post.category || ''} • ${formatTime(post.created_at || post.date)}</div>
         </div>
       `;
 
       const body = document.createElement('div');
       body.className = 'post-card-body';
-      body.textContent = message;
+      body.textContent = post.content || '';
 
       card.appendChild(header);
       card.appendChild(body);
+
+      if (post.image_url) {
+        const image = document.createElement('img');
+        image.src = post.image_url;
+        image.alt = post.title || 'Image du post';
+        image.style.maxWidth = '100%';
+        image.style.borderRadius = '10px';
+        image.style.marginTop = '12px';
+        card.appendChild(image);
+      }
+
       return card;
     }
 
-    postForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const author = postForm.author ? postForm.author.value.trim() : '';
-      const message = postForm.message ? postForm.message.value.trim() : '';
-      if (!author || !message) return;
+    function renderPosts(posts) {
+      if (!feed) return;
 
-      const postCard = createPostCard(author, message);
-      if (emptyMessage) { emptyMessage.remove(); }
-      feed.prepend(postCard);
-      postForm.reset();
-      if (postForm.author) postForm.author.focus();
+      feed.innerHTML = '';
+      if (!posts || posts.length === 0) {
+        feed.innerHTML = '<div class="empty-feed">Aucune publication pour le moment. Écrivez un message pour le voir apparaître ici.</div>';
+        return;
+      }
+
+      posts.forEach((post) => feed.appendChild(createPostCard(post)));
+    }
+
+    async function loadPosts() {
+      if (!window.getPosts) return;
+      const { data, error } = await window.getPosts();
+      if (error) {
+        if (statusBox) {
+          showStatus('Impossible de charger les publications.', 'error');
+        }
+        return;
+      }
+      renderPosts(data || []);
+    }
+
+    loadPosts();
+
+    postForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const stored = localStorage.getItem('cookimeUser');
+      let userObj = null;
+      try { userObj = stored ? JSON.parse(stored) : null; } catch (e) { userObj = null; }
+
+      if (!userObj || !userObj.id) {
+        showStatus('Connectez-vous pour publier un post.', 'error');
+        return;
+      }
+
+      const titleInput = document.getElementById('title');
+      const categoryInput = document.getElementById('category');
+      const contentInput = document.getElementById('content');
+      const imageInput = document.getElementById('image');
+
+      const title = titleInput ? titleInput.value.trim() : '';
+      const content = contentInput ? contentInput.value.trim() : '';
+      const category = categoryInput ? categoryInput.value : '';
+
+      if (!title || !content || !category) {
+        showStatus('Le titre, le contenu et la catégorie sont obligatoires.', 'error');
+        return;
+      }
+
+      const submitButton = postForm.querySelector('button[type="submit"]');
+      if (submitButton) submitButton.disabled = true;
+
+      try {
+        let imageUrl = null;
+
+        if (imageInput && imageInput.files && imageInput.files.length > 0) {
+          const file = imageInput.files[0];
+          const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+          const storagePath = `posts/${userObj.id}/${fileName}`;
+
+          const storageClient = window.supabaseClient;
+          if (!storageClient || !storageClient.storage) {
+            showStatus('Le stockage Supabase n’est pas disponible.', 'error');
+            if (submitButton) submitButton.disabled = false;
+            return;
+          }
+
+          const { data: uploadData, error: uploadError } = await storageClient.storage
+            .from(STORAGE_BUCKET)
+            .upload(storagePath, file, { cacheControl: '3600', upsert: false });
+
+          if (uploadError) {
+            const detail = uploadError.message || 'Erreur inconnue';
+            showStatus('Impossible de téléverser l’image : ' + detail + ' (bucket: ' + STORAGE_BUCKET + ')', 'error');
+            if (submitButton) submitButton.disabled = false;
+            return;
+          }
+
+          const { data: publicUrlData } = storageClient.storage
+            .from(STORAGE_BUCKET)
+            .getPublicUrl(uploadData.path);
+
+          imageUrl = publicUrlData?.publicUrl || null;
+        }
+
+        const { data, error } = await window.createPost({
+          user_id: userObj.id,
+          title,
+          content,
+          date: new Date().toISOString().slice(0, 10),
+          author: userObj.username || userObj.email || 'Utilisateur',
+          category,
+          created_at: new Date().toISOString(),
+          image_url: imageUrl,
+        });
+
+        if (error) {
+          showStatus(error.message || 'Erreur lors de la publication.', 'error');
+          if (submitButton) submitButton.disabled = false;
+          return;
+        }
+
+        showStatus('Post publié avec succès.', 'success');
+        postForm.reset();
+        await loadPosts();
+        if (submitButton) submitButton.disabled = false;
+      } catch (err) {
+        showStatus('Une erreur est survenue pendant la publication.', 'error');
+        if (submitButton) submitButton.disabled = false;
+      }
     });
   }
 
@@ -131,6 +254,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const registerForm = document.getElementById('registerForm');
   if (registerForm) {
+    // Helpers to centralize alert visibility
+    function hideAlerts() {
+      const err = document.getElementById('alertError');
+      const suc = document.getElementById('alertSuccess');
+      if (err) { err.style.display = 'none'; }
+      if (suc) { suc.style.display = 'none'; }
+    }
+    function showError(msg) {
+      hideAlerts();
+      const err = document.getElementById('alertError');
+      const alertMsg = document.getElementById('alertMsg');
+      if (err) { err.style.display = 'flex'; }
+      if (alertMsg) { alertMsg.textContent = msg; }
+    }
+    function showSuccess(msg) {
+      hideAlerts();
+      const suc = document.getElementById('alertSuccess');
+      const successMsg = document.getElementById('successMsg');
+      if (suc) { suc.style.display = 'flex'; }
+      if (successMsg) { successMsg.textContent = msg; }
+    }
+
+    // Ensure alerts hidden initially
+    hideAlerts();
+
     registerForm.addEventListener('submit', async function (e) {
       e.preventDefault();
       let valid = true;
@@ -140,14 +288,11 @@ document.addEventListener('DOMContentLoaded', function () {
       const emailErr = document.getElementById('emailError');
       const pwdErr = document.getElementById('pwdError');
       const confirmErr = document.getElementById('confirmError');
-      const alertError = document.getElementById('alertError');
-      const alertSuccess = document.getElementById('alertSuccess');
 
       if (emailErr) emailErr.textContent = '';
       if (pwdErr) pwdErr.textContent = '';
       if (confirmErr) confirmErr.textContent = '';
-      if (alertError) alertError.style.display = 'none';
-      if (alertSuccess) alertSuccess.style.display = 'none';
+      hideAlerts();
 
       if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
         if (emailErr) emailErr.textContent = 'Adresse e-mail invalide.';
@@ -165,10 +310,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!valid) { return; }
 
       if (!window.supabase || !window.supabase.createClient) {
-        if (alertError) {
-          alertError.style.display = 'flex';
-          document.getElementById('alertMsg').textContent = 'Supabase non configuré.';
-        }
+        showError('Supabase non configuré.');
         return;
       }
 
@@ -179,19 +321,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const { user, error } = await registerSupabase(email.value.trim(), pwd.value);
       if (error || !user) {
-        if (alertError) {
-          alertError.style.display = 'flex';
-          document.getElementById('alertMsg').textContent = error?.message || 'Erreur lors de l’inscription.';
-        }
+        showError(error?.message || 'Erreur lors de l’inscription.');
         if (spinner) spinner.hidden = true;
         if (btnText) btnText.style.opacity = '1';
         return;
       }
 
-      if (alertSuccess) {
-        alertSuccess.style.display = 'flex';
-        document.getElementById('successMsg').textContent = 'Compte créé avec succès, la BDD répond correctement.';
-      }
+      showSuccess('Compte créé avec succès, la BDD répond correctement.');
       if (spinner) spinner.hidden = true;
       if (btnText) btnText.style.opacity = '1';
     });
@@ -208,5 +344,151 @@ document.addEventListener('DOMContentLoaded', function () {
   if (params.get('success') === '1') {
     const alertSuccess = document.getElementById('alertSuccess');
     if (alertSuccess) alertSuccess.style.display = 'flex';
+  }
+
+  // --- Account page: récupérer et afficher les informations utilisateur ---
+  const accountCard = document.querySelector('.account-card');
+  if (accountCard) {
+    (async () => {
+      const nameEl = document.querySelector('.account-meta .name');
+      const emailEl = document.querySelector('.account-meta .email');
+      const inputName = document.getElementById('display_name');
+      const inputEmail = document.getElementById('email');
+      const loginLink = document.getElementById('loginLink');
+      const logoutLink = document.getElementById('logoutLink');
+      const accountForm = document.getElementById('accountForm');
+      const accountStatus = document.getElementById('accountStatus');
+
+      let currentUser = null;
+
+      let stored = localStorage.getItem('cookimeUser');
+      if (loginLink) {
+        loginLink.hidden = Boolean(stored);
+      }
+      if (logoutLink) {
+        logoutLink.hidden = !stored;
+      }
+
+      if (!stored) {
+        if (nameEl) nameEl.textContent = 'Visiteur';
+        if (emailEl) emailEl.textContent = 'Connectez-vous pour gérer votre compte.';
+        if (accountStatus) {
+          accountStatus.textContent = 'Vous devez être connecté pour modifier votre profil.';
+          accountStatus.style.display = 'block';
+          accountStatus.className = 'login-alert login-alert--error';
+        }
+        return;
+      }
+
+      let userObj;
+      try { userObj = JSON.parse(stored); } catch (e) { userObj = null; }
+      if (!userObj) return;
+
+      let result;
+      if (userObj.id && window.getUserById) {
+        result = await window.getUserById(userObj.id);
+      } else if (userObj.email && window.getUserByEmail) {
+        result = await window.getUserByEmail(userObj.email);
+      }
+
+      currentUser = result?.user || userObj;
+      if (currentUser) {
+        if (nameEl) nameEl.textContent = currentUser.username || 'Utilisateur';
+        if (emailEl) emailEl.textContent = currentUser.email || '';
+        if (inputName) inputName.value = currentUser.username || '';
+        if (inputEmail) inputEmail.value = currentUser.email || '';
+      }
+
+      if (accountForm) {
+        accountForm.addEventListener('submit', async function (event) {
+          event.preventDefault();
+
+          if (!currentUser?.id) {
+            if (accountStatus) {
+              accountStatus.textContent = 'Vous devez être connecté pour modifier votre profil.';
+              accountStatus.className = 'login-alert login-alert--error';
+              accountStatus.style.display = 'block';
+            }
+            return;
+          }
+
+          const username = document.getElementById('display_name').value.trim();
+          const email = document.getElementById('email').value.trim().toLowerCase();
+          const password = document.getElementById('newPassword').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+
+          if (!username || !email) {
+            if (accountStatus) {
+              accountStatus.textContent = 'Le nom affiché et l’e-mail sont obligatoires.';
+              accountStatus.className = 'login-alert login-alert--error';
+              accountStatus.style.display = 'block';
+            }
+            return;
+          }
+
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            if (accountStatus) {
+              accountStatus.textContent = 'Veuillez saisir une adresse e-mail valide.';
+              accountStatus.className = 'login-alert login-alert--error';
+              accountStatus.style.display = 'block';
+            }
+            return;
+          }
+
+          if (password && password.length < 6) {
+            if (accountStatus) {
+              accountStatus.textContent = 'Le mot de passe doit contenir au moins 6 caractères.';
+              accountStatus.className = 'login-alert login-alert--error';
+              accountStatus.style.display = 'block';
+            }
+            return;
+          }
+
+          if (password && password !== confirmPassword) {
+            if (accountStatus) {
+              accountStatus.textContent = 'Les mots de passe ne correspondent pas.';
+              accountStatus.className = 'login-alert login-alert--error';
+              accountStatus.style.display = 'block';
+            }
+            return;
+          }
+
+          const submitButton = accountForm.querySelector('button[type="submit"]');
+          if (submitButton) submitButton.disabled = true;
+
+          const { user: updatedUser, error } = await window.updateUserProfile(currentUser.id, {
+            username,
+            email,
+            password: password || undefined,
+          });
+
+          if (submitButton) submitButton.disabled = false;
+
+          if (error) {
+            if (accountStatus) {
+              accountStatus.textContent = error.message || 'Erreur lors de la mise à jour.';
+              accountStatus.className = 'login-alert login-alert--error';
+              accountStatus.style.display = 'block';
+            }
+            return;
+          }
+
+          if (updatedUser) {
+            currentUser = updatedUser;
+            localStorage.setItem('cookimeUser', JSON.stringify(updatedUser));
+            if (nameEl) nameEl.textContent = updatedUser.username || 'Utilisateur';
+            if (emailEl) emailEl.textContent = updatedUser.email || '';
+            if (accountStatus) {
+              accountStatus.textContent = 'Profil mis à jour avec succès.';
+              accountStatus.className = 'login-alert login-alert--success';
+              accountStatus.style.display = 'block';
+            }
+            accountForm.reset();
+            if (inputName) inputName.value = updatedUser.username || '';
+            if (inputEmail) inputEmail.value = updatedUser.email || '';
+          }
+        });
+      }
+    })();
   }
 });

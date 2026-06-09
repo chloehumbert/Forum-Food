@@ -129,11 +129,13 @@ header::after {
   flex-shrink: 0;
 }
 
-.header-stamp span {
-  font-size: .55rem;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  opacity: .85;
+.header-stamp img.header-logo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin-top: 3px;
 }
 
 /* ───────────────────────────────────────────
@@ -1205,6 +1207,7 @@ body.login-page footer {
 .account-actions a, .account-actions button { text-decoration:none; padding:10px 16px; border-radius:10px; border:none; cursor:pointer; font-weight:700; }
 .btn-edit { background:linear-gradient(135deg,var(--akane),var(--kaki)); color:#fff; }
 .btn-logout { background:transparent; color:var(--sumi); border:1px solid rgba(200,117,58,.12); }
+.btn-login { background:linear-gradient(135deg,var(--akane),var(--kaki)); color:#fff; }
 .account-section { margin-top:20px; }
 .field { display:block; margin-bottom:12px; }
 .field label { display:block; font-weight:700; margin-bottom:6px; }
