@@ -65,7 +65,62 @@ async function getUserByEmail(email) {
   return { user: data, error };
 }
 
+async function updateUserProfile(userId, updates) {
+  if (!userId) {
+    return { user: null, error: { message: 'Utilisateur non identifié.' } };
+  }
+
+  const username = typeof updates.username === 'string' ? updates.username.trim() : '';
+  const email = typeof updates.email === 'string' ? updates.email.trim().toLowerCase() : '';
+  const password = typeof updates.password === 'string' ? updates.password : '';
+
+  if (!username || !email) {
+    return { user: null, error: { message: 'Le nom affiché et l’email sont requis.' } };
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { user: null, error: { message: 'Adresse e-mail invalide.' } };
+  }
+
+  const { data: existingUsers, error: checkError } = await supabaseClient
+    .from('users')
+    .select('id, username, email')
+    .or(`username.eq.${username},email.eq.${email}`);
+
+  if (checkError) {
+    return { user: null, error: checkError };
+  }
+
+  const duplicate = (existingUsers || []).find((u) => u.id !== userId);
+  if (duplicate) {
+    if (duplicate.username?.toLowerCase() === username.toLowerCase()) {
+      return { user: null, error: { message: 'Ce nom d’utilisateur est déjà utilisé.' } };
+    }
+    if (duplicate.email?.toLowerCase() === email.toLowerCase()) {
+      return { user: null, error: { message: 'Cette adresse e-mail est déjà utilisée.' } };
+    }
+  }
+
+  const updatePayload = { username, email };
+  if (password) {
+    if (password.length < 6) {
+      return { user: null, error: { message: 'Le mot de passe doit contenir au moins 6 caractères.' } };
+    }
+    updatePayload.password = password;
+  }
+
+  const { data, error } = await supabaseClient
+    .from('users')
+    .update(updatePayload)
+    .eq('id', userId)
+    .select('id, username, email, role')
+    .single();
+
+  return { user: data, error };
+}
+
 // Rendre ces helpers accessibles globalement au script client
 window.getUserById = getUserById;
 window.getUserByEmail = getUserByEmail;
+window.updateUserProfile = updateUserProfile;
 window.supabaseClient = supabaseClient;
