@@ -392,7 +392,59 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       currentUser = result?.user || userObj;
+      const myPostsContainer = document.getElementById("my-posts");
+
+        async function loadMyPosts() {
+
+          const { data, error } = await window.getPostsByUser(currentUser.id);
+
+          if (error) return;
+
+          myPostsContainer.innerHTML = "";
+
+          if (data.length === 0) {
+            myPostsContainer.innerHTML = "<p>Aucun post.</p>";
+            return;
+          }
+
+          data.forEach(post => {
+
+            const div = document.createElement("div");
+
+            div.className = "post-card";
+
+            div.innerHTML = `
+              <h4>${post.title}</h4>
+              <p>${post.content}</p>
+              <button class="delete-post" data-id="${post.id}">
+                Supprimer
+              </button>
+              <hr>
+            `;
+
+            myPostsContainer.appendChild(div);
+
+          });
+
+          document.querySelectorAll(".delete-post").forEach(btn => {
+
+            btn.addEventListener("click", async () => {
+
+              if (!confirm("Supprimer ce post ?")) return;
+
+              const error = await window.deletePost(btn.dataset.id);
+
+              if (!error) {
+                loadMyPosts();
+              }
+
+            });
+
+          });
+
+        }
       if (currentUser) {
+        loadMyPosts();
         if (nameEl) nameEl.textContent = currentUser.username || 'Utilisateur';
         if (emailEl) emailEl.textContent = currentUser.email || '';
         if (inputName) inputName.value = currentUser.username || '';
