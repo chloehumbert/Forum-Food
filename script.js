@@ -419,7 +419,6 @@ document.addEventListener('DOMContentLoaded', function () {
               <button class="delete-post" data-id="${post.id}">
                 Supprimer
               </button>
-              <hr>
             `;
 
             myPostsContainer.appendChild(div);
@@ -429,8 +428,6 @@ document.addEventListener('DOMContentLoaded', function () {
           document.querySelectorAll(".delete-post").forEach(btn => {
 
             btn.addEventListener("click", async () => {
-
-              if (!confirm("Supprimer ce post ?")) return;
 
               const error = await window.deletePost(btn.dataset.id);
 
