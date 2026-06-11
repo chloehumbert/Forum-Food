@@ -157,10 +157,30 @@ async function updateUserProfile(userId, updates) {
   return { user: data, error };
 }
 
+async function getPostsByUser(userId) {
+  const { data, error } = await supabaseClient
+    .from("posts")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  return { data, error };
+}
+async function deletePost(postId) {
+  const { error } = await supabaseClient
+    .from("posts")
+    .delete()
+    .eq("id", postId);
+
+  return error;
+}
+
 // Rendre ces helpers accessibles globalement au script client
 window.getUserById = getUserById;
 window.getUserByEmail = getUserByEmail;
 window.updateUserProfile = updateUserProfile;
 window.createPost = createPost;
 window.getPosts = getPosts;
+window.getPostsByUser = getPostsByUser;
+window.deletePost = deletePost;
 window.supabaseClient = supabaseClient;
