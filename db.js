@@ -282,6 +282,77 @@ async function toggleLike(postId, userId, type) {
 
   return { data, error };
 }
+
+
+// ============================================================
+// COMMENTAIRES
+// ============================================================
+
+async function getComments(postId) {
+  const { data, error } = await supabaseClient
+    .from('comments')
+    .select('id, post_id, user_id, content, created_at, users(username)')
+    .eq('post_id', postId)
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('getComments error:', error);
+    return [];
+  }
+
+  return (data || []).map(c => ({
+    ...c,
+    author: c.users?.username || 'Anonyme',
+  }));
+}
+
+async function createComment(postId, content) {
+  const trimmed = (content || '').trim();
+  if (!trimmed) {
+    return { data: null, error: { message: 'Le commentaire ne peut pas être vide.' } };
+  }
+
+  const { user } = await getCurrentUser();
+  if (!user) {
+    return { data: null, error: { message: 'Vous devez être connecté pour commenter.' } };
+  }
+
+  const { data, error } = await supabaseClient
+    .from('comments')
+    .insert([{ post_id: postId, user_id: user.id, content: trimmed }])
+    .select('id, post_id, user_id, content, created_at')
+    .single();
+
+  if (error) return { data: null, error };
+
+  return { data: { ...data, author: user.username }, error: null };
+}
+
+async function deleteComment(commentId) {
+  const { error } = await supabaseClient
+    .from('comments')
+    .delete()
+    .eq('id', commentId);
+
+  return { error };
+}
+
+async function updateComment(commentId, content) {
+  const trimmed = (content || '').trim();
+  if (!trimmed) {
+    return { data: null, error: { message: 'Le commentaire ne peut pas être vide.' } };
+  }
+
+  const { data, error } = await supabaseClient
+    .from('comments')
+    .update({ content: trimmed })
+    .eq('id', commentId)
+    .select('id, post_id, user_id, content, created_at')
+    .single();
+
+  return { data, error };
+}
+
 async function updateUserProfile(userId, updates) {
   if (!userId) {
     return { user: null, error: { message: 'Utilisateur non identifié.' } };
@@ -377,4 +448,14 @@ window.updatePost = updatePost;
 window.logoutSupabase = logoutSupabase;
 window.getCurrentUser = getCurrentUser;
 window.getLikes = getLikes;
+<<<<<<< HEAD
 window.toggleLike = toggleLike;
+=======
+window.toggleLike = toggleLike;
+window.db = {
+  getComments,
+  createComment,
+  deleteComment,
+  updateComment,
+};
+>>>>>>> e515b2e1883499c1cd032f4c5e58c84892c8d201

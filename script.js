@@ -184,8 +184,8 @@ document.addEventListener('DOMContentLoaded', async function () {
       likeBar.appendChild(dislikeBtn);
       card.appendChild(likeBar);
 
-      // -------------------------------------------------------
-      // Section commentaires (toggle)
+     // -------------------------------------------------------
+      // Section commentaires (toggle, CRUD complet)
       // -------------------------------------------------------
       const commentToggle = document.createElement('button');
       commentToggle.className = 'comment-toggle-btn';
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       const commentsList = document.createElement('div');
       commentsList.className = 'comments-list';
 
-      // Formulaire
+      // Formulaire d'envoi
       const commentForm = document.createElement('form');
       commentForm.className = 'comment-form';
       commentForm.innerHTML = `
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       commentSection.appendChild(commentsList);
       commentSection.appendChild(commentForm);
 
-      // Charger et afficher les commentaires
+      // Charger et afficher les commentaires du post
       async function loadComments() {
         if (!window.db?.getComments) return;
         const comments = await window.db.getComments(post.id);
@@ -222,25 +222,112 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         comments.forEach(c => {
+          const isOwner = Boolean(userObj && c.user_id === userObj.id);
+
           const div = document.createElement('div');
           div.className = 'comment-item';
+          div.dataset.id = c.id;
+
           div.innerHTML = `
-            <strong>${c.author || 'Anonyme'}</strong>
-            <span class="comment-date">${new Date(c.date || c.created_at).toLocaleString('fr-FR')}</span>
-            <p>${c.content}</p>
+            <div class="comment-item-header">
+              <strong>${c.author || 'Anonyme'}</strong>
+              <span class="comment-date">${formatTime(c.created_at || c.date)}</span>
+            </div>
+            <p class="comment-content">${c.content}</p>
+            ${isOwner ? `
+              <div class="comment-actions">
+                <button class="btn-edit-comment" data-id="${c.id}">✏️ Modifier</button>
+                <button class="btn-delete-comment" data-id="${c.id}">🗑️ Supprimer</button>
+              </div>
+              <div class="comment-edit-form" id="comment-edit-${c.id}" style="display:none;">
+                <textarea class="comment-edit-input" rows="2">${c.content}</textarea>
+                <div class="comment-edit-actions">
+                  <button class="btn-save-comment" data-id="${c.id}">💾 Enregistrer</button>
+                  <button class="btn-cancel-comment" data-id="${c.id}">✖ Annuler</button>
+                </div>
+              </div>
+            ` : ''}
           `;
+
           commentsList.appendChild(div);
         });
       }
 
-      // Toggle ouverture/fermeture
+      // Délégation d'événements pour modifier/supprimer un commentaire
+      commentsList.addEventListener('click', async (e) => {
+
+        // SUPPRIMER
+        if (e.target.closest('.btn-delete-comment')) {
+          const btn = e.target.closest('.btn-delete-comment');
+          const commentId = btn.dataset.id;
+          if (!confirm('Supprimer ce commentaire ?')) return;
+
+          btn.disabled = true;
+          const { error } = await window.db.deleteComment(commentId);
+
+          if (error) {
+            btn.disabled = false;
+            showStatus('Erreur lors de la suppression du commentaire.', 'error');
+            return;
+          }
+
+          const item = commentsList.querySelector(`.comment-item[data-id="${commentId}"]`);
+          if (item) item.remove();
+          if (commentsList.querySelectorAll('.comment-item').length === 0) {
+            commentsList.innerHTML = '<p class="no-comments">Aucun commentaire.</p>';
+          }
+        }
+
+        // OUVRIR/FERMER LE FORMULAIRE D'ÉDITION
+        if (e.target.closest('.btn-edit-comment')) {
+          const commentId = e.target.closest('.btn-edit-comment').dataset.id;
+          const form = document.getElementById(`comment-edit-${commentId}`);
+          if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // ANNULER L'ÉDITION
+        if (e.target.closest('.btn-cancel-comment')) {
+          const commentId = e.target.closest('.btn-cancel-comment').dataset.id;
+          const form = document.getElementById(`comment-edit-${commentId}`);
+          if (form) form.style.display = 'none';
+        }
+
+        // ENREGISTRER LA MODIFICATION
+        if (e.target.closest('.btn-save-comment')) {
+          const btn = e.target.closest('.btn-save-comment');
+          const commentId = btn.dataset.id;
+          const form = document.getElementById(`comment-edit-${commentId}`);
+          const textarea = form?.querySelector('.comment-edit-input');
+          const newContent = textarea?.value.trim();
+
+          if (!newContent) {
+            showStatus('Le commentaire ne peut pas être vide.', 'error');
+            return;
+          }
+
+          btn.disabled = true;
+          const { data, error } = await window.db.updateComment(commentId, newContent);
+          btn.disabled = false;
+
+          if (error || !data) {
+            showStatus('Erreur lors de la mise à jour du commentaire.', 'error');
+            return;
+          }
+
+          const item = commentsList.querySelector(`.comment-item[data-id="${commentId}"]`);
+          if (item) item.querySelector('.comment-content').textContent = newContent;
+          if (form) form.style.display = 'none';
+        }
+      });
+
+      // Toggle ouverture/fermeture de la section
       commentToggle.addEventListener('click', async () => {
         const isOpen = commentSection.style.display !== 'none';
         commentSection.style.display = isOpen ? 'none' : 'block';
         if (!isOpen) await loadComments();
       });
 
-      // Soumission commentaire
+      // Soumission d'un nouveau commentaire
       commentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const textarea = commentForm.querySelector('.comment-input');
@@ -252,11 +339,21 @@ document.addEventListener('DOMContentLoaded', async function () {
           return;
         }
 
+        const submitBtn = commentForm.querySelector('.comment-submit');
+        if (submitBtn) submitBtn.disabled = true;
+
         if (window.db?.createComment) {
-          await window.db.createComment(post.id, text);
-          textarea.value = '';
-          await loadComments();
+          const { error } = await window.db.createComment(post.id, text);
+
+          if (error) {
+            showStatus(error.message || 'Erreur lors de l\'envoi du commentaire.', 'error');
+          } else {
+            textarea.value = '';
+            await loadComments();
+          }
         }
+
+        if (submitBtn) submitBtn.disabled = false;
       });
 
       card.appendChild(commentToggle);
