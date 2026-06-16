@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="login-page">
+
 <header>
   <div class="header-inner">
     <a href="/" class="site-logo">
@@ -18,6 +19,7 @@
     </div>
   </div>
 </header>
+
 <nav>
   <ul>
     <li><a href="/">Accueil</a></li>
@@ -25,6 +27,7 @@
     <li><a href="/register.html" class="active">Créer un compte</a></li>
   </ul>
 </nav>
+
 <div class="login-wrapper">
   <div class="login-deco" aria-hidden="true">
     <div class="deco-kanji"></div>
@@ -36,6 +39,7 @@
     </ul>
     <div class="deco-torii">⛩️</div>
   </div>
+
   <div class="login-card">
     <div class="login-card-top">
       <div class="login-avatar-ring"><span></span></div>
@@ -43,6 +47,8 @@
         <span class="login-title-fr">Créer un compte</span>
       </h1>
     </div>
+
+    <!-- Alertes -->
     <div class="login-alert login-alert--error" id="alertError" style="display:none">
       <span class="alert-icon">⚠</span>
       <span id="alertMsg">Erreur lors de l'inscription.</span>
@@ -51,54 +57,75 @@
       <span class="alert-icon">✓</span>
       <span id="successMsg">Compte créé avec succès ! Vérifiez votre e-mail.</span>
     </div>
+
     <form class="login-form" id="registerForm" action="#" novalidate>
+
+      <!-- Email -->
       <div class="field-group">
-        <label for="email" class="field-label">
-          Adresse e-mail
-        </label>
+        <label for="email" class="field-label">Adresse e-mail</label>
         <div class="field-wrap">
           <span class="field-icon">✉</span>
-          <input type="email" id="email" class="field-input" placeholder="vous@exemple.com" autocomplete="email" required>
+          <input type="email" id="email" class="field-input"
+                 placeholder="vous@exemple.com" autocomplete="email" required>
         </div>
         <span class="field-error" id="emailError"></span>
       </div>
+
+      <!-- Nom d'utilisateur -->
       <div class="field-group">
-        <label for="password" class="field-label">
-          Mot de passe
-        </label>
+        <label for="username" class="field-label">Nom d'utilisateur</label>
+        <div class="field-wrap">
+          <span class="field-icon">👤</span>
+          <input type="text" id="username" class="field-input"
+                 placeholder="MonPseudo" autocomplete="username" required>
+        </div>
+        <span class="field-error" id="usernameError"></span>
+      </div>
+
+      <!-- Mot de passe -->
+      <div class="field-group">
+        <label for="password" class="field-label">Mot de passe</label>
         <div class="field-wrap">
           <span class="field-icon">🔑</span>
-          <input type="password" id="password" class="field-input" placeholder="••••••••" autocomplete="new-password" required>
+          <input type="password" id="password" class="field-input"
+                 placeholder="••••••••" autocomplete="new-password" required>
         </div>
         <span class="field-error" id="pwdError"></span>
       </div>
+
+      <!-- Confirmer mot de passe -->
       <div class="field-group">
-        <label for="confirmPassword" class="field-label">
-          Confirmer le mot de passe
-        </label>
+        <label for="confirmPassword" class="field-label">Confirmer le mot de passe</label>
         <div class="field-wrap">
           <span class="field-icon">🔒</span>
-          <input type="password" id="confirmPassword" class="field-input" placeholder="••••••••" autocomplete="new-password" required>
+          <input type="password" id="confirmPassword" class="field-input"
+                 placeholder="••••••••" autocomplete="new-password" required>
         </div>
         <span class="field-error" id="confirmError"></span>
       </div>
+
       <button type="submit" class="btn-login" id="btnRegister">
         <span class="btn-login-text">Créer mon compte</span>
         <span class="btn-login-jp"></span>
         <span class="btn-login-spinner" id="registerSpinner" hidden>⟳</span>
       </button>
+
     </form>
+
     <div class="login-sep"><span></span><span class="sep-text">ou</span><span></span></div>
     <p class="register-link">Vous avez déjà un compte ? <a href="/login.html">Se connecter</a></p>
     <a href="/" class="back-link">← Retour au forum</a>
   </div>
 </div>
+
 <footer>
   <span class="footer-jp">Cookime</span>
   &copy; 2025 Cookime — Tous droits réservés &nbsp;|&nbsp; Connexion via Supabase Auth
 </footer>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
 <script src="db.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
