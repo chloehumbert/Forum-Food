@@ -61,7 +61,6 @@ header {
   padding: 28px 32px 22px;
 }
 
-/* Motif ondulé style kakemono */
 header::before {
   content: '';
   position: absolute;
@@ -71,7 +70,6 @@ header::before {
   opacity: .6;
 }
 
-/* Grand kanji décoratif */
 header::after {
   content: '';
   position: absolute;
@@ -230,8 +228,6 @@ nav ul li a.active::after {
   letter-spacing: .1em;
 }
 
-
-/* Catégorie forum */
 .forum-category {
   background: var(--shiro);
   border-radius: var(--r);
@@ -269,7 +265,6 @@ nav ul li a.active::after {
   opacity: .7;
 }
 
-/* Lignes de topics */
 .topic-row {
   display: grid;
   grid-template-columns: auto 1fr auto auto;
@@ -460,7 +455,6 @@ nav ul li a.active::after {
 
 .widget-body { padding: 16px 18px; }
 
-/* Widget Infos pratiques */
 .info-list { list-style: none; }
 
 .info-list li {
@@ -491,7 +485,6 @@ nav ul li a.active::after {
   font-size: .78rem;
 }
 
-/* Widget membres actifs */
 .member-grid {
   display: flex;
   flex-wrap: wrap;
@@ -519,7 +512,6 @@ nav ul li a.active::after {
   flex-shrink: 0;
 }
 
-/* Widget Saisons / Calendrier */
 .season-row {
   display: flex;
   align-items: center;
@@ -617,14 +609,11 @@ footer .footer-jp {
   .header-inner { padding: 18px 16px; }
   .site-logo .jp-title { font-size: 1.9rem; }
 }
+
 /* ═══════════════════════════════════════════════════════
-   LOGIN.CSS — Styles spécifiques à la page de connexion
-   À charger APRÈS style.css
+   LOGIN — Styles spécifiques à la page de connexion
 ════════════════════════════════════════════════════════ */
 
-/* ───────────────────────────────────────────
-   BODY OVERRIDE — centrage vertical
-─────────────────────────────────────────── */
 body.login-page {
   display: flex;
   flex-direction: column;
@@ -635,9 +624,6 @@ body.login-page footer {
   margin-top: auto;
 }
 
-/* ───────────────────────────────────────────
-   WRAPPER GLOBAL LOGIN
-─────────────────────────────────────────── */
 .login-wrapper {
   flex: 1;
   display: flex;
@@ -651,9 +637,6 @@ body.login-page footer {
   animation: fadeUp .5s ease both;
 }
 
-/* ───────────────────────────────────────────
-   PANNEAU DÉCORATIF GAUCHE
-─────────────────────────────────────────── */
 .login-deco {
   flex: 0 0 260px;
   background: linear-gradient(160deg, var(--akane) 0%, var(--kaki) 55%, var(--kogane) 100%);
@@ -669,7 +652,6 @@ body.login-page footer {
   box-shadow: var(--shadow-deep);
 }
 
-/* Cercles décoratifs en fond */
 .login-deco::before {
   content: '';
   position: absolute;
@@ -755,9 +737,6 @@ body.login-page footer {
   align-self: flex-end;
 }
 
-/* ───────────────────────────────────────────
-   CARTE DE CONNEXION
-─────────────────────────────────────────── */
 .login-card {
   flex: 1;
   background: var(--shiro);
@@ -771,7 +750,6 @@ body.login-page footer {
   flex-direction: column;
 }
 
-/* Top de carte — avatar + titre */
 .login-card-top {
   display: flex;
   align-items: center;
@@ -814,9 +792,6 @@ body.login-page footer {
   text-transform: uppercase;
 }
 
-/* ───────────────────────────────────────────
-   ALERTES
-─────────────────────────────────────────── */
 .login-alert {
   display: flex;
   align-items: center;
@@ -846,9 +821,6 @@ body.login-page footer {
   flex-shrink: 0;
 }
 
-/* ───────────────────────────────────────────
-   FORMULAIRE
-─────────────────────────────────────────── */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -943,9 +915,6 @@ body.login-page footer {
   padding-left: 4px;
 }
 
-/* ───────────────────────────────────────────
-   OPTIONS (Remember me + Forgot)
-─────────────────────────────────────────── */
 .login-options {
   display: flex;
   align-items: center;
@@ -1000,9 +969,6 @@ body.login-page footer {
 
 .forgot-link:hover { color: var(--akane); }
 
-/* ───────────────────────────────────────────
-   BOUTON LOGIN
-─────────────────────────────────────────── */
 .btn-login {
   margin-top: 6px;
   position: relative;
@@ -1072,9 +1038,6 @@ body.login-page footer {
   to { transform: rotate(360deg); }
 }
 
-/* ───────────────────────────────────────────
-   SÉPARATEUR
-─────────────────────────────────────────── */
 .login-sep {
   display: flex;
   align-items: center;
@@ -1096,9 +1059,6 @@ body.login-page footer {
   text-transform: uppercase;
 }
 
-/* ───────────────────────────────────────────
-   LIENS BAS DE CARTE
-─────────────────────────────────────────── */
 .register-link {
   text-align: center;
   font-size: .82rem;
@@ -1128,9 +1088,6 @@ body.login-page footer {
 
 .back-link:hover { color: var(--sumi); }
 
-/* ───────────────────────────────────────────
-   RESPONSIVE
-─────────────────────────────────────────── */
 @media (max-width: 720px) {
   .login-wrapper {
     flex-direction: column;
@@ -1162,7 +1119,7 @@ body.login-page footer {
 }
 
 /* ═══════════════════════════════════════════════════════
-   POSTS — styles extraits de posts.html
+   POSTS
 ════════════════════════════════════════════════════════ */
 
 .post-panel {
@@ -1195,7 +1152,7 @@ body.login-page footer {
 .empty-feed { padding:20px; font-size:.92rem; color:var(--cha); }
 
 /* ═══════════════════════════════════════════════════════
-   ACCOUNT — styles extraits de account.html
+   ACCOUNT
 ════════════════════════════════════════════════════════ */
 
 .account-card { max-width:800px; margin:36px auto; padding:20px; background:var(--shiro); border-radius:var(--r); box-shadow:var(--shadow-warm); border:1px solid rgba(200,117,58,.12); }
@@ -1375,3 +1332,242 @@ body.login-page footer {
   gap: 12px;
 }
 
+
+#my-posts .post-card {
+  background: var(--shiro);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-warm);
+  border: 1px solid rgba(200,117,58,.12);
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+#my-posts .post-card h4 {
+  color: var(--sumi);
+  font-family: 'Shippori Mincho', serif;
+  margin-bottom: 10px;
+}
+
+#my-posts .post-card p {
+  color: var(--cha);
+  line-height: 1.6;
+}
+
+.delete-post {
+  margin-top: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, var(--akane), var(--kaki));
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-family: 'Zen Maru Gothic', serif;
+  font-size: .95rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: .06em;
+  box-shadow: 0 4px 18px rgba(217,79,61,.35);
+  transition: transform .15s, box-shadow .15s;
+  overflow: hidden;
+}
+
+.delete-post::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--kaki), var(--kogane));
+  opacity: 0;
+  transition: opacity .25s;
+}
+
+.delete-post:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 24px rgba(217,79,61,.45);
+}
+
+.delete-post:hover::before { opacity: 1; }
+
+.delete-post span {
+  position: relative;
+  z-index: 1;
+}
+
+.heart-icon {
+  font-size: 1.4rem;
+  color: #888;
+  transition: 0.2s;
+}
+
+.heart-icon.active {
+  color: #e63946;
+  transform: scale(1.15);
+}
+
+.like-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+ .like-btn.active .heart-icon {
+  color: #e63946;
+}
+.dislike-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+ .like-btn.active .heart-icon {
+  color: #e63946;
+}
+
+/* ═══════════════════════════════════════════════════════
+   COMMENTAIRES
+════════════════════════════════════════════════════════ */
+
+.comment-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--akane);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 700;
+  transition: background 0.2s;
+}
+
+.comment-toggle-btn:hover {
+  background: rgba(200,117,58,.08);
+}
+
+.comment-section {
+  border-top: 1px solid rgba(200,117,58,.15);
+  padding: 0.8rem 18px 18px;
+}
+
+.comment-item {
+  margin-bottom: 0.8rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--shiro2);
+  border-radius: 8px;
+  border: 1px solid rgba(200,117,58,.1);
+}
+
+.comment-item strong {
+  display: block;
+  color: var(--sumi);
+  font-size: .85rem;
+}
+
+.comment-date {
+  font-size: 0.72rem;
+  color: var(--cha);
+  letter-spacing: .03em;
+}
+
+.comment-item p {
+  margin: 0.3rem 0 0;
+  color: var(--cha);
+  font-size: .88rem;
+  line-height: 1.6;
+}
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+.comment-input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgba(200,117,58,.25);
+  border-radius: 8px;
+  resize: vertical;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: .9rem;
+  background: var(--shiro2);
+  color: var(--sumi);
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: var(--kaki);
+  box-shadow: 0 0 0 3px rgba(200,117,58,.1);
+}
+
+.comment-submit {
+  align-self: flex-end;
+  padding: 0.45rem 1.1rem;
+  background: linear-gradient(135deg, var(--akane), var(--kaki));
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: .88rem;
+  transition: transform .15s, box-shadow .15s;
+}
+
+.comment-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(217,79,61,.3);
+}
+
+.comment-submit:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.no-comments {
+  color: var(--cha);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+
+
+.my-post-card {
+  background: #fff;
+  border: 1px solid #e8e0d5;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.my-post-card-title   { font-weight: 700; color: #3d2b1f; margin-bottom: 4px; }
+.my-post-card-meta    { font-size: 0.8rem; color: #a08060; margin-bottom: 8px; }
+.my-post-card-content { font-size: 0.9rem; color: #5a4030; margin-bottom: 12px; white-space: pre-wrap; }
+.my-post-card-actions { display: flex; gap: 10px; margin-bottom: 8px; }
+
+.btn-edit-post, .btn-delete-post {
+  padding: 6px 14px; border-radius: 8px; border: none;
+  cursor: pointer; font-size: 0.85rem; font-weight: 600;
+}
+.btn-edit-post   { background: #f0e6d3; color: #7a4f2e; }
+.btn-delete-post { background: #fde8e8; color: #c0392b; }
+.btn-edit-post:hover, .btn-delete-post:hover { opacity: 0.75; }
+
+.edit-post-form   { border-top: 1px solid #e8e0d5; margin-top: 12px; padding-top: 12px; }
+.edit-form-btns   { display: flex; gap: 10px; margin-top: 10px; }
+.btn-save-post    { background: #c8a96e; color: #fff; border: none; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-cancel-edit  { background: #eee; color: #555; border: none; padding: 7px 16px; border-radius: 8px; cursor: pointer; }
+.no-posts         { color: #a08060; font-style: italic; }
