@@ -435,61 +435,6 @@ async function updatePost(postId, updates) {
 
   return error ? null : data;
 }
-// ============================================================
-// COMMENTAIRES
-// ============================================================
-
-async function getComments(postId) {
-  if (!postId) return [];
-
-  const { data, error } = await supabaseClient
-    .from('comments')
-    .select('id, post_id, user_id, content, created_at, data')
-    .eq('post_id', postId)
-    .order('created_at', { ascending: true });
-
-  if (error) {
-    console.error('getComments error:', error);
-    return [];
-  }
-
-  // Récupérer les usernames associés
-  if (!data || data.length === 0) return [];
-
-  const userIds = [...new Set(data.map(c => c.user_id).filter(Boolean))];
-
-  const { data: users } = await supabaseClient
-    .from('users')
-    .select('id, username')
-    .in('id', userIds);
-
-  const userMap = {};
-  if (users) users.forEach(u => { userMap[u.id] = u.username; });
-
-  return data.map(c => ({
-    ...c,
-    author: userMap[c.user_id] || 'Anonyme'
-  }));
-}
-
-async function createComment(postId, userId, content) {
-  if (!postId || !userId || !content?.trim()) {
-    return { data: null, error: { message: 'Paramètres invalides.' } };
-  }
-
-  const { data, error } = await supabaseClient
-    .from('comments')
-    .insert([{
-      post_id: postId,
-      user_id: userId,
-      content: content.trim(),
-      data: new Date().toISOString()
-    }])
-    .select('*')
-    .single();
-
-  return { data, error };
-}
 
 // Rendre ces helpers accessibles globalement au script client
 window.getUserById = getUserById;
