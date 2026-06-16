@@ -1417,18 +1417,6 @@ body.login-page footer {
   gap: 6px;
 }
 
- .like-btn.active .heart-icon {
-  color: #e63946;
-}
-.dislike-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
 
  .like-btn.active .heart-icon {
   color: #e63946;

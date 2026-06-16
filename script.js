@@ -93,96 +93,65 @@ document.addEventListener('DOMContentLoaded', async function () {
         card.appendChild(image);
       }
 
-      // ============================================================
-      // ❤️💔 SYSTÈME LIKE / DISLIKE
-      // ============================================================
+     // ============================================================
+// ❤️ SYSTÈME LIKE (like_count)
+// ============================================================
 
-      const likeBar = document.createElement('div');
-      likeBar.className = 'post-like-bar';
+const likeBar = document.createElement('div');
+likeBar.className = 'post-like-bar';
 
-      const likeBtn = document.createElement('button');
-      likeBtn.className = 'like-btn';
-      likeBtn.dataset.postId = post.id;
+const likeBtn = document.createElement('button');
+likeBtn.className = 'like-btn';
+likeBtn.dataset.postId = post.id;
 
-      const dislikeBtn = document.createElement('button');
-      dislikeBtn.className = 'dislike-btn';
-      dislikeBtn.dataset.postId = post.id;
+// Récupérer le count actuel
+let likesCount = post.like_count || 0;
 
-      let likesCount = 0;
-      let dislikesCount = 0;
-      let userVote = null;
+// Vérifier si l'user a déjà liké (via localStorage)
+const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
+let hasLiked = likedPosts.includes(post.id);
 
-      // Charger les votes existants
-      if (window.getLikes) {
-        const { data } = await window.getLikes(post.id);
-        if (data) {
-          likesCount = data.filter(v => v.type === 'like').length;
-          dislikesCount = data.filter(v => v.type === 'dislike').length;
+function renderLikeBtn() {
+  likeBtn.innerHTML = `❤️ <span>${likesCount}</span>`;
+  likeBtn.classList.toggle('active', hasLiked);
+}
 
-          if (userObj) {
-            const myVote = data.find(v => v.user_id === userObj.id);
-            if (myVote) userVote = myVote.type;
-          }
-        }
-      }
+renderLikeBtn();
 
-      // Affichage des boutons
-      function renderButtons() {
-        likeBtn.innerHTML = `❤️ <span>${likesCount}</span>`;
-        dislikeBtn.innerHTML = `💔 <span>${dislikesCount}</span>`;
-        likeBtn.classList.toggle('active', userVote === 'like');
-        dislikeBtn.classList.toggle('active', userVote === 'dislike');
-      }
+likeBtn.addEventListener('click', async () => {
+  if (!userObj) {
+    showStatus('Connectez-vous pour voter.', 'error');
+    return;
+  }
 
-      renderButtons();
+  if (hasLiked) {
+    // Déjà liké → on retire
+    hasLiked = false;
+    likesCount--;
+    renderLikeBtn();
 
-      // Gestion du vote
-      async function handleVote(type) {
-        if (!userObj) {
-          showStatus('Connectez-vous pour voter.', 'error');
-          return;
-        }
+    // Retirer du localStorage
+    const updated = likedPosts.filter(id => id !== post.id);
+    localStorage.setItem('likedPosts', JSON.stringify(updated));
 
-        const prevVote = userVote;
+    await window.decrementLike(post.id);
 
-        // Optimistic UI
-        if (prevVote === type) {
-          userVote = null;
-          if (type === 'like') likesCount--;
-          else dislikesCount--;
-        } else {
-          if (prevVote === 'like') likesCount--;
-          if (prevVote === 'dislike') dislikesCount--;
-          userVote = type;
-          if (type === 'like') likesCount++;
-          else dislikesCount++;
-        }
+  } else {
+    // Pas encore liké → on ajoute
+    hasLiked = true;
+    likesCount++;
+    renderLikeBtn();
 
-        renderButtons();
+    // Sauvegarder dans localStorage
+    likedPosts.push(post.id);
+    localStorage.setItem('likedPosts', JSON.stringify(likedPosts));
 
-        // Mise à jour Supabase
-        if (window.toggleLike) {
-          const { error } = await window.toggleLike(post.id, userObj.id, type);
-          if (error) {
-            // rollback
-            userVote = prevVote;
-            const { data } = await window.getLikes(post.id);
-            if (data) {
-              likesCount = data.filter(v => v.type === 'like').length;
-              dislikesCount = data.filter(v => v.type === 'dislike').length;
-            }
-            renderButtons();
-            showStatus('Erreur lors du vote.', 'error');
-          }
-        }
-      }
+    await window.incrementLike(post.id);
+  }
+});
 
-      likeBtn.addEventListener('click', () => handleVote('like'));
-      dislikeBtn.addEventListener('click', () => handleVote('dislike'));
-
-      likeBar.appendChild(likeBtn);
-      likeBar.appendChild(dislikeBtn);
-      card.appendChild(likeBar);
+likeBar.appendChild(likeBtn);
+card.appendChild(likeBar);
 
       // -------------------------------------------------------
       // Section commentaires (toggle)

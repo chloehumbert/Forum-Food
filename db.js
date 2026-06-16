@@ -314,3 +314,82 @@ window.getPostById = getPostById;
 window.updatePost = updatePost;
 window.logoutSupabase = logoutSupabase;
 window.getCurrentUser = getCurrentUser;
+// ============================================================
+// LIKES / DISLIKES
+// ============================================================
+
+window.getLikes = async function (postId) {
+  const { data, error } = await supabaseClient
+    .from('likes')
+    .select('*')
+    .eq('post_id', postId);
+  return { data, error };
+};
+
+window.toggleLike = async function (postId, userId, type) {
+  // Chercher un vote existant
+  const { data: existing } = await supabaseClient
+    .from('likes')
+    .select('*')
+    .eq('post_id', postId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  // Même vote → on supprime (toggle off)
+  if (existing && existing.type === type) {
+    const { error } = await supabaseClient
+      .from('likes')
+      .delete()
+      .eq('id', existing.id);
+    return { error };
+  }
+
+  // Vote différent → on met à jour
+  if (existing) {
+    const { error } = await supabaseClient
+      .from('likes')
+      .update({ type })
+      .eq('id', existing.id);
+    return { error };
+  }
+
+  // Aucun vote → on insère
+  const { error } = await supabaseClient
+    .from('likes')
+    .insert([{ post_id: postId, user_id: userId, type }]);
+  return { error };
+};
+
+// ============================================================
+// COMMENTAIRES
+// ============================================================
+
+window.db = window.db || {};
+
+window.db.getComments = async function (postId) {
+  const { data, error } = await supabaseClient
+    .from('comments')
+    .select('*')
+    .eq('post_id', postId)
+    .order('created_at', { ascending: true });
+  if (error) return [];
+  return data || [];
+};
+
+window.db.createComment = async function (postId, content) {
+  // Récupérer l'utilisateur connecté
+  const stored = localStorage.getItem('cookimeUser');
+  let userObj = null;
+  try { userObj = stored ? JSON.parse(stored) : null; } catch (e) {}
+
+  const { data, error } = await supabaseClient
+    .from('comments')
+    .insert([{
+      post_id:    postId,
+      content:    content,
+      user_id:    userObj?.id   || null,
+      author:     userObj?.username || userObj?.email || 'Anonyme',
+      created_at: new Date().toISOString()
+    }]);
+  return { data, error };
+};
