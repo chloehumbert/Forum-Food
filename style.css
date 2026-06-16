@@ -1333,5 +1333,45 @@ body.login-page footer {
   color: var(--sumi);
   resize: vertical;
 }
+.post-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
 
+.post-actions button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.edit-post-btn {
+  background: #2d7ef7;
+  color: white;
+}
+
+.delete-post-btn {
+  background: #d9534f;
+  color: white;
+}
+
+.edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.edit-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: min(500px, 90vw);
+  display: grid;
+  gap: 12px;
+}
 

@@ -1,25 +1,61 @@
-document.addEventListener('DOMContentLoaded', function () {
-  // --- Posts page: create and load posts in Supabase ---
+document.addEventListener('DOMContentLoaded', async function () {
+
+  // ============================================================
+  // UTILITAIRES GLOBAUX
+  // ============================================================
+
+  function formatTime(date) {
+    const value = date ? new Date(date) : new Date();
+    return value.toLocaleString('fr-FR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  async function getLoggedUser() {
+    if (!window.getCurrentUser) return null;
+    const { user } = await window.getCurrentUser();
+    return user || null;
+  }
+
+  // ============================================================
+  // NAV : affichage login/logout
+  // ============================================================
+
+  const loginLink  = document.getElementById('loginLink');
+  const logoutLink = document.getElementById('logoutLink');
+
+  const currentUser = await getLoggedUser();
+
+  if (loginLink)  loginLink.hidden  = Boolean(currentUser);
+  if (logoutLink) logoutLink.hidden = !currentUser;
+
+  if (logoutLink) {
+    logoutLink.addEventListener('click', async function (e) {
+      e.preventDefault();
+      await window.logoutSupabase();
+      localStorage.removeItem('cookimeUser');
+      window.location.href = 'login.html';
+    });
+  }
+
+  // ============================================================
+  // PAGE POSTS
+  // ============================================================
+
   const postForm = document.getElementById('post-form');
   if (postForm) {
     const STORAGE_BUCKET = 'cookime-image-posts';
-    const feed = document.getElementById('posts-feed');
-    const emptyMessage = document.querySelector('.empty-feed');
+    const feed      = document.getElementById('posts-feed');
     const statusBox = document.getElementById('postStatus');
 
     function showStatus(message, type) {
       if (!statusBox) return;
       statusBox.textContent = message;
-      statusBox.className = type === 'success' ? 'login-alert login-alert--success' : 'login-alert login-alert--error';
+      statusBox.className = type === 'success'
+        ? 'login-alert login-alert--success'
+        : 'login-alert login-alert--error';
       statusBox.style.display = 'block';
-    }
-
-    function formatTime(date) {
-      const value = date ? new Date(date) : new Date();
-      return value.toLocaleString('fr-FR', {
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-      });
     }
 
     function createPostCard(post) {
@@ -32,7 +68,9 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="avatar">${(post.author || 'U').charAt(0).toUpperCase()}</div>
         <div>
           <div class="post-card-title">${post.title || 'Post'}</div>
-          <div class="post-card-meta">Par ${post.author || 'Utilisateur'} • ${post.category || ''} • ${formatTime(post.created_at || post.date)}</div>
+          <div class="post-card-meta">
+            Par ${post.author || 'Utilisateur'} • ${post.category || ''} • ${formatTime(post.created_at || post.date)}
+          </div>
         </div>
       `;
 
@@ -47,9 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const image = document.createElement('img');
         image.src = post.image_url;
         image.alt = post.title || 'Image du post';
-        image.style.maxWidth = '100%';
-        image.style.borderRadius = '10px';
-        image.style.marginTop = '12px';
+        image.style.cssText = 'max-width:100%;border-radius:10px;margin-top:12px;';
         card.appendChild(image);
       }
 
@@ -58,121 +94,101 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderPosts(posts) {
       if (!feed) return;
-
       feed.innerHTML = '';
       if (!posts || posts.length === 0) {
-        feed.innerHTML = '<div class="empty-feed">Aucune publication pour le moment. Écrivez un message pour le voir apparaître ici.</div>';
+        feed.innerHTML = '<div class="empty-feed">Aucune publication pour le moment.</div>';
         return;
       }
-
       posts.forEach((post) => feed.appendChild(createPostCard(post)));
     }
 
     async function loadPosts() {
       if (!window.getPosts) return;
       const { data, error } = await window.getPosts();
-      if (error) {
-        if (statusBox) {
-          showStatus('Impossible de charger les publications.', 'error');
-        }
-        return;
-      }
+      if (error) { showStatus('Impossible de charger les publications.', 'error'); return; }
       renderPosts(data || []);
     }
 
-    loadPosts();
+    await loadPosts();
 
-    postForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
+    postForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-      const stored = localStorage.getItem('cookimeUser');
-      let userObj = null;
-      try { userObj = stored ? JSON.parse(stored) : null; } catch (e) { userObj = null; }
-
-      if (!userObj || !userObj.id) {
+      const user = await getLoggedUser();
+      if (!user) {
         showStatus('Connectez-vous pour publier un post.', 'error');
         return;
       }
 
-      const titleInput = document.getElementById('title');
-      const categoryInput = document.getElementById('category');
-      const contentInput = document.getElementById('content');
+      const title      = document.getElementById('title')?.value.trim();
+      const content    = document.getElementById('content')?.value.trim();
+      const category   = document.getElementById('category')?.value;
       const imageInput = document.getElementById('image');
-
-      const title = titleInput ? titleInput.value.trim() : '';
-      const content = contentInput ? contentInput.value.trim() : '';
-      const category = categoryInput ? categoryInput.value : '';
 
       if (!title || !content || !category) {
         showStatus('Le titre, le contenu et la catégorie sont obligatoires.', 'error');
         return;
       }
 
-      const submitButton = postForm.querySelector('button[type="submit"]');
-      if (submitButton) submitButton.disabled = true;
+      const submitBtn = postForm.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
 
       try {
         let imageUrl = null;
 
-        if (imageInput && imageInput.files && imageInput.files.length > 0) {
+        if (imageInput?.files?.length > 0) {
           const file = imageInput.files[0];
-          const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-          const storagePath = `posts/${userObj.id}/${fileName}`;
+          const storagePath = `posts/${user.id}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
 
-          const storageClient = window.supabaseClient;
-          if (!storageClient || !storageClient.storage) {
-            showStatus('Le stockage Supabase n’est pas disponible.', 'error');
-            if (submitButton) submitButton.disabled = false;
-            return;
-          }
-
-          const { data: uploadData, error: uploadError } = await storageClient.storage
+          const { data: uploadData, error: uploadError } = await window.supabaseClient.storage
             .from(STORAGE_BUCKET)
             .upload(storagePath, file, { cacheControl: '3600', upsert: false });
 
           if (uploadError) {
-            const detail = uploadError.message || 'Erreur inconnue';
-            showStatus('Impossible de téléverser l’image : ' + detail + ' (bucket: ' + STORAGE_BUCKET + ')', 'error');
-            if (submitButton) submitButton.disabled = false;
+            showStatus('Impossible de téléverser l\'image : ' + uploadError.message, 'error');
+            if (submitBtn) submitBtn.disabled = false;
             return;
           }
 
-          const { data: publicUrlData } = storageClient.storage
+          const { data: publicUrlData } = window.supabaseClient.storage
             .from(STORAGE_BUCKET)
             .getPublicUrl(uploadData.path);
 
           imageUrl = publicUrlData?.publicUrl || null;
         }
 
-        const { data, error } = await window.createPost({
-          user_id: userObj.id,
+        const { error } = await window.createPost({
+          user_id:    user.id,
           title,
           content,
-          date: new Date().toISOString().slice(0, 10),
-          author: userObj.username || userObj.email || 'Utilisateur',
           category,
+          author:     user.username || user.email || 'Utilisateur',
+          date:       new Date().toISOString().slice(0, 10),
           created_at: new Date().toISOString(),
-          image_url: imageUrl,
+          image_url:  imageUrl,
         });
 
         if (error) {
           showStatus(error.message || 'Erreur lors de la publication.', 'error');
-          if (submitButton) submitButton.disabled = false;
+          if (submitBtn) submitBtn.disabled = false;
           return;
         }
 
-        showStatus('Post publié avec succès.', 'success');
+        showStatus('Post publié avec succès !', 'success');
         postForm.reset();
         await loadPosts();
-        if (submitButton) submitButton.disabled = false;
       } catch (err) {
-        showStatus('Une erreur est survenue pendant la publication.', 'error');
-        if (submitButton) submitButton.disabled = false;
+        showStatus('Une erreur est survenue.', 'error');
       }
+
+      if (submitBtn) submitBtn.disabled = false;
     });
   }
 
-  // --- Login page helpers ---
+  // ============================================================
+  // PAGE LOGIN
+  // ============================================================
+
   const togglePwd = document.getElementById('togglePwd');
   if (togglePwd) {
     togglePwd.addEventListener('click', function () {
@@ -186,63 +202,49 @@ document.addEventListener('DOMContentLoaded', function () {
   if (loginForm) {
     loginForm.addEventListener('submit', async function (e) {
       e.preventDefault();
-      let valid = true;
-      const email = document.getElementById('email');
-      const pwd = document.getElementById('password');
+
+      const email    = document.getElementById('email');
+      const pwd      = document.getElementById('password');
       const emailErr = document.getElementById('emailError');
-      const pwdErr = document.getElementById('pwdError');
-      const alertError = document.getElementById('alertError');
+      const pwdErr   = document.getElementById('pwdError');
+      const alertError   = document.getElementById('alertError');
       const alertSuccess = document.getElementById('alertSuccess');
+      const alertMsg     = document.getElementById('alertMsg');
+      const spinner  = document.getElementById('loginSpinner');
+      const txt      = document.querySelector('.btn-login-text');
+      const jp       = document.querySelector('.btn-login-jp');
+      const btnLogin = document.getElementById('btnLogin');
 
       if (emailErr) emailErr.textContent = '';
-      if (pwdErr) pwdErr.textContent = '';
-      if (alertError) alertError.style.display = 'none';
+      if (pwdErr)   pwdErr.textContent   = '';
+      if (alertError)   alertError.style.display   = 'none';
       if (alertSuccess) alertSuccess.style.display = 'none';
 
+      let valid = true;
       if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
         if (emailErr) emailErr.textContent = 'Adresse e-mail invalide.';
-        if (email.closest) email.closest('.field-wrap')?.classList.add('has-error');
         valid = false;
-      } else {
-        if (email.closest) email.closest('.field-wrap')?.classList.remove('has-error');
       }
-
       if (!pwd.value || pwd.value.length < 6) {
         if (pwdErr) pwdErr.textContent = 'Le mot de passe doit comporter au moins 6 caractères.';
-        if (pwd.closest) pwd.closest('.field-wrap')?.classList.add('has-error');
         valid = false;
-      } else {
-        if (pwd.closest) pwd.closest('.field-wrap')?.classList.remove('has-error');
       }
+      if (!valid) return;
 
-      if (!valid) { return; }
-
-      if (!window.supabase || !window.supabase.createClient) {
-        if (alertError) {
-          alertError.style.display = 'flex';
-          document.getElementById('alertMsg').textContent = 'Supabase non configuré.';
-        }
-        return;
-      }
-
-      const spinner = document.getElementById('loginSpinner');
-      if (spinner) spinner.style.display = 'inline-block';
-      const txt = document.querySelector('.btn-login-text');
-      const jp = document.querySelector('.btn-login-jp');
+      if (spinner)  spinner.style.display = 'inline-block';
       if (txt) txt.style.opacity = '0';
-      if (jp) jp.style.opacity = '0';
-      document.getElementById('btnLogin').disabled = true;
+      if (jp)  jp.style.opacity  = '0';
+      if (btnLogin) btnLogin.disabled = true;
 
-      const { user, error } = await loginSupabase(email.value.trim(), pwd.value);
+      const { user, error } = await window.loginSupabase(email.value.trim(), pwd.value);
+
       if (error || !user) {
-        if (alertError) {
-          alertError.style.display = 'flex';
-          document.getElementById('alertMsg').textContent = 'Email ou mot de passe incorrect.';
-        }
-        if (spinner) spinner.style.display = 'none';
+        if (alertError) alertError.style.display = 'flex';
+        if (alertMsg)   alertMsg.textContent = 'Email ou mot de passe incorrect.';
+        if (spinner)  spinner.style.display = 'none';
         if (txt) txt.style.opacity = '1';
-        if (jp) jp.style.opacity = '1';
-        document.getElementById('btnLogin').disabled = false;
+        if (jp)  jp.style.opacity  = '1';
+        if (btnLogin) btnLogin.disabled = false;
         return;
       }
 
@@ -252,50 +254,63 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // ============================================================
+  // PAGE REGISTER
+  // ============================================================
+
   const registerForm = document.getElementById('registerForm');
   if (registerForm) {
-    // Helpers to centralize alert visibility
+
     function hideAlerts() {
       const err = document.getElementById('alertError');
       const suc = document.getElementById('alertSuccess');
-      if (err) { err.style.display = 'none'; }
-      if (suc) { suc.style.display = 'none'; }
+      if (err) err.style.display = 'none';
+      if (suc) suc.style.display = 'none';
     }
     function showError(msg) {
       hideAlerts();
-      const err = document.getElementById('alertError');
+      const err      = document.getElementById('alertError');
       const alertMsg = document.getElementById('alertMsg');
-      if (err) { err.style.display = 'flex'; }
-      if (alertMsg) { alertMsg.textContent = msg; }
+      if (err)      err.style.display    = 'flex';
+      if (alertMsg) alertMsg.textContent = msg;
     }
     function showSuccess(msg) {
       hideAlerts();
-      const suc = document.getElementById('alertSuccess');
+      const suc        = document.getElementById('alertSuccess');
       const successMsg = document.getElementById('successMsg');
-      if (suc) { suc.style.display = 'flex'; }
-      if (successMsg) { successMsg.textContent = msg; }
+      if (suc)        suc.style.display       = 'flex';
+      if (successMsg) successMsg.textContent  = msg;
     }
 
-    // Ensure alerts hidden initially
     hideAlerts();
 
     registerForm.addEventListener('submit', async function (e) {
       e.preventDefault();
-      let valid = true;
-      const email = document.getElementById('email');
-      const pwd = document.getElementById('password');
-      const confirmPwd = document.getElementById('confirmPassword');
-      const emailErr = document.getElementById('emailError');
-      const pwdErr = document.getElementById('pwdError');
-      const confirmErr = document.getElementById('confirmError');
 
-      if (emailErr) emailErr.textContent = '';
-      if (pwdErr) pwdErr.textContent = '';
-      if (confirmErr) confirmErr.textContent = '';
+      const email       = document.getElementById('email');
+      const username    = document.getElementById('username');
+      const pwd         = document.getElementById('password');
+      const confirmPwd  = document.getElementById('confirmPassword');
+      const emailErr    = document.getElementById('emailError');
+      const usernameErr = document.getElementById('usernameError');
+      const pwdErr      = document.getElementById('pwdError');
+      const confirmErr  = document.getElementById('confirmError');
+      const spinner     = document.getElementById('registerSpinner');
+      const btnText     = document.querySelector('.btn-login-text');
+
+      if (emailErr)    emailErr.textContent    = '';
+      if (usernameErr) usernameErr.textContent = '';
+      if (pwdErr)      pwdErr.textContent      = '';
+      if (confirmErr)  confirmErr.textContent  = '';
       hideAlerts();
 
+      let valid = true;
       if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
         if (emailErr) emailErr.textContent = 'Adresse e-mail invalide.';
+        valid = false;
+      }
+      if (!username.value.trim()) {
+        if (usernameErr) usernameErr.textContent = 'Le nom d\'utilisateur est obligatoire.';
         valid = false;
       }
       if (!pwd.value || pwd.value.length < 6) {
@@ -306,79 +321,61 @@ document.addEventListener('DOMContentLoaded', function () {
         if (confirmErr) confirmErr.textContent = 'Les mots de passe ne correspondent pas.';
         valid = false;
       }
+      if (!valid) return;
 
-      if (!valid) { return; }
-
-      if (!window.supabase || !window.supabase.createClient) {
-        showError('Supabase non configuré.');
-        return;
-      }
-
-      const spinner = document.getElementById('registerSpinner');
       if (spinner) spinner.hidden = false;
-      const btnText = document.querySelector('.btn-login-text');
       if (btnText) btnText.style.opacity = '0';
 
-      const { user, error } = await registerSupabase(email.value.trim(), pwd.value);
+      const { user, error } = await window.registerSupabase(
+        email.value.trim(),
+        pwd.value,
+        username.value.trim()
+      );
+
       if (error || !user) {
-        showError(error?.message || 'Erreur lors de l’inscription.');
+        showError(error?.message || 'Erreur lors de l\'inscription.');
         if (spinner) spinner.hidden = true;
         if (btnText) btnText.style.opacity = '1';
         return;
       }
 
-      showSuccess('Compte créé avec succès, la BDD répond correctement.');
+      showSuccess('Compte créé avec succès ! Vous pouvez vous connecter.');
       if (spinner) spinner.hidden = true;
       if (btnText) btnText.style.opacity = '1';
+      registerForm.reset();
     });
   }
 
-  // Show server-side flags
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('error') === '1') {
-    const alertError = document.getElementById('alertError');
-    const alertMsg = document.getElementById('alertMsg');
-    if (alertError) { alertError.style.display = 'flex'; }
-    if (alertMsg) { alertMsg.textContent = 'Email ou mot de passe incorrect.'; }
-  }
-  if (params.get('success') === '1') {
-    const alertSuccess = document.getElementById('alertSuccess');
-    if (alertSuccess) alertSuccess.style.display = 'flex';
-  }
+  // ============================================================
+  // PAGE ACCOUNT
+  // ============================================================
 
-  // --- Account page: récupérer et afficher les informations utilisateur ---
   const accountCard = document.querySelector('.account-card');
   if (accountCard) {
-    (async () => {
-      const nameEl = document.querySelector('.account-meta .name');
-      const emailEl = document.querySelector('.account-meta .email');
-      const inputName = document.getElementById('display_name');
-      const inputEmail = document.getElementById('email');
-      const loginLink = document.getElementById('loginLink');
-      const logoutLink = document.getElementById('logoutLink');
-      const accountForm = document.getElementById('accountForm');
-      const accountStatus = document.getElementById('accountStatus');
+    const nameEl        = document.querySelector('.account-meta .name');
+    const emailEl       = document.querySelector('.account-meta .email');
+    const inputName     = document.getElementById('display_name');
+    const inputEmail    = document.getElementById('email');
+    const accountForm   = document.getElementById('accountForm');
+    const accountStatus = document.getElementById('accountStatus');
 
-      let currentUser = null;
+    function showAccountStatus(msg, type) {
+      if (!accountStatus) return;
+      accountStatus.textContent = msg;
+      accountStatus.className = type === 'success'
+        ? 'login-alert login-alert--success'
+        : 'login-alert login-alert--error';
+      accountStatus.style.display = 'block';
+    }
 
-      let stored = localStorage.getItem('cookimeUser');
-      if (loginLink) {
-        loginLink.hidden = Boolean(stored);
-      }
-      if (logoutLink) {
-        logoutLink.hidden = !stored;
-      }
+    const user = await getLoggedUser();
 
-      if (!stored) {
-        if (nameEl) nameEl.textContent = 'Visiteur';
-        if (emailEl) emailEl.textContent = 'Connectez-vous pour gérer votre compte.';
-        if (accountStatus) {
-          accountStatus.textContent = 'Vous devez être connecté pour modifier votre profil.';
-          accountStatus.style.display = 'block';
-          accountStatus.className = 'login-alert login-alert--error';
-        }
-        return;
-      }
+    if (!user) {
+      if (nameEl)  nameEl.textContent  = 'Visiteur';
+      if (emailEl) emailEl.textContent = 'Connectez-vous pour gérer votre compte.';
+      showAccountStatus('Vous devez être connecté pour modifier votre profil.', 'error');
+      return;
+    }
 
       let userObj;
       try { userObj = JSON.parse(stored); } catch (e) { userObj = null; }
@@ -392,241 +389,76 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       currentUser = result?.user || userObj;
-      const myPostsContainer = document.getElementById("my-posts");
-
-        async function loadMyPosts() {
-
-          const { data, error } = await window.getPostsByUser(currentUser.id);
-
-          if (error) return;
-
-          myPostsContainer.innerHTML = "";
-
-          if (data.length === 0) {
-            myPostsContainer.innerHTML = "<p>Aucun post.</p>";
-            return;
-          }
-
-          data.forEach(post => {
-
-            const div = document.createElement("div");
-
-            div.className = "post-card";
-
-            div.innerHTML = `
-              <h4>${post.title}</h4>
-              <p>${post.content}</p>
-              <div class="post-actions">
-                <button class="edit-post" data-id="${post.id}" data-title="${post.title}" data-content="${post.content}" data-category="${post.category || ''}" data-image="${post.image_url || ''}">
-                  Modifier
-                </button>
-                <button class="delete-post" data-id="${post.id}">
-                  Supprimer
-                </button>
-              </div>
-            `;
-
-            myPostsContainer.appendChild(div);
-
-          });
-          document.querySelectorAll(".edit-post").forEach(btn => {
-            btn.addEventListener("click", () => {
-              const postId = btn.dataset.id;
-              const title = btn.dataset.title || "";
-              const content = btn.dataset.content || "";
-              const category = btn.dataset.category || "";
-              const image = btn.dataset.image || "";
-
-              let editBox = document.getElementById("accountEditBox");
-              if (!editBox) {
-                editBox = document.createElement("div");
-                editBox.id = "accountEditBox";
-                editBox.className = "post-card";
-                editBox.className = "account-edit-box";
-                editBox.innerHTML = `
-                  <h4>Modifier le post</h4>
-
-                  <div class="field">
-                    <label for="editPostTitle">Titre</label>
-                    <input id="editPostTitle" type="text" placeholder="Titre du post">
-                  </div>
-
-                  <div class="field">
-                    <label for="editPostCategory">Catégorie</label>
-                    <select id="editPostCategory">
-                      <option value="">Choisir une catégorie</option>
-                      <option value="entrée">Entrée</option>
-                      <option value="plat">Plat</option>
-                      <option value="dessert">Dessert</option>
-                    </select>
-                  </div>
-
-                  <div class="field">
-                    <label for="editPostContent">Contenu</label>
-                    <textarea id="editPostContent" rows="5" placeholder="Contenu du post"></textarea>
-                  </div>
-
-                  <div class="field">
-                    <label for="editPostImage">URL image</label>
-                    <input id="editPostImage" type="text" placeholder="URL de l'image">
-                  </div>
-
-                  <div class="post-actions">
-                    <button type="button" id="saveEditedPost" class="btn-save-edit">Enregistrer</button>
-                    <button type="button" id="cancelEditedPost" class="btn-cancel-edit">Annuler</button>
-                  </div>
-                `;
-                myPostsContainer.prepend(editBox);
-              }
-
-              document.getElementById("editPostTitle").value = title;
-              document.getElementById("editPostContent").value = content;
-              document.getElementById("editPostCategory").value = category;
-              document.getElementById("editPostImage").value = image;
-
-              document.getElementById("saveEditedPost").onclick = async () => {
-                const updatedTitle = document.getElementById("editPostTitle").value.trim();
-                const updatedContent = document.getElementById("editPostContent").value.trim();
-                const updatedCategory = document.getElementById("editPostCategory").value;
-                const updatedImage = document.getElementById("editPostImage").value.trim();
-
-                const { error } = await window.supabaseClient
-                  .from("posts")
-                  .update({
-                    title: updatedTitle,
-                    content: updatedContent,
-                    category: updatedCategory,
-                    image_url: updatedImage || null
-                  })
-                  .eq("id", postId);
-
-                if (!error) {
-                  editBox.remove();
-                  loadMyPosts();
-                } else {
-                  alert("Impossible de modifier le post.");
-                }
-              };
-
-              document.getElementById("cancelEditedPost").onclick = () => {
-                editBox.remove();
-              };
-            });
-          });
-          document.querySelectorAll(".delete-post").forEach(btn => {
-          
-
-            btn.addEventListener("click", async () => {
-
-              const error = await window.deletePost(btn.dataset.id);
-
-              if (!error) {
-                loadMyPosts();
-              }
-
-            });
-
-          });
-
-        }
       if (currentUser) {
-        loadMyPosts();
         if (nameEl) nameEl.textContent = currentUser.username || 'Utilisateur';
         if (emailEl) emailEl.textContent = currentUser.email || '';
         if (inputName) inputName.value = currentUser.username || '';
         if (inputEmail) inputEmail.value = currentUser.email || '';
       }
 
-      if (accountForm) {
-        accountForm.addEventListener('submit', async function (event) {
-          event.preventDefault();
+    if (accountForm) {
+      accountForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
 
-          if (!currentUser?.id) {
-            if (accountStatus) {
-              accountStatus.textContent = 'Vous devez être connecté pour modifier votre profil.';
-              accountStatus.className = 'login-alert login-alert--error';
-              accountStatus.style.display = 'block';
-            }
-            return;
-          }
+        const username        = document.getElementById('display_name').value.trim();
+        const email           = document.getElementById('email').value.trim().toLowerCase();
+        const password        = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
 
-          const username = document.getElementById('display_name').value.trim();
-          const email = document.getElementById('email').value.trim().toLowerCase();
-          const password = document.getElementById('newPassword').value;
-          const confirmPassword = document.getElementById('confirmPassword').value;
+        if (!username || !email) {
+          showAccountStatus('Le nom affiché et l\'e-mail sont obligatoires.', 'error'); return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showAccountStatus('Veuillez saisir une adresse e-mail valide.', 'error'); return;
+        }
+        if (password && password.length < 6) {
+          showAccountStatus('Le mot de passe doit contenir au moins 6 caractères.', 'error'); return;
+        }
+        if (password && password !== confirmPassword) {
+          showAccountStatus('Les mots de passe ne correspondent pas.', 'error'); return;
+        }
 
-          if (!username || !email) {
-            if (accountStatus) {
-              accountStatus.textContent = 'Le nom affiché et l’e-mail sont obligatoires.';
-              accountStatus.className = 'login-alert login-alert--error';
-              accountStatus.style.display = 'block';
-            }
-            return;
-          }
+        const submitBtn = accountForm.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
 
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            if (accountStatus) {
-              accountStatus.textContent = 'Veuillez saisir une adresse e-mail valide.';
-              accountStatus.className = 'login-alert login-alert--error';
-              accountStatus.style.display = 'block';
-            }
-            return;
-          }
-
-          if (password && password.length < 6) {
-            if (accountStatus) {
-              accountStatus.textContent = 'Le mot de passe doit contenir au moins 6 caractères.';
-              accountStatus.className = 'login-alert login-alert--error';
-              accountStatus.style.display = 'block';
-            }
-            return;
-          }
-
-          if (password && password !== confirmPassword) {
-            if (accountStatus) {
-              accountStatus.textContent = 'Les mots de passe ne correspondent pas.';
-              accountStatus.className = 'login-alert login-alert--error';
-              accountStatus.style.display = 'block';
-            }
-            return;
-          }
-
-          const submitButton = accountForm.querySelector('button[type="submit"]');
-          if (submitButton) submitButton.disabled = true;
-
-          const { user: updatedUser, error } = await window.updateUserProfile(currentUser.id, {
-            username,
-            email,
-            password: password || undefined,
-          });
-
-          if (submitButton) submitButton.disabled = false;
-
-          if (error) {
-            if (accountStatus) {
-              accountStatus.textContent = error.message || 'Erreur lors de la mise à jour.';
-              accountStatus.className = 'login-alert login-alert--error';
-              accountStatus.style.display = 'block';
-            }
-            return;
-          }
-
-          if (updatedUser) {
-            currentUser = updatedUser;
-            localStorage.setItem('cookimeUser', JSON.stringify(updatedUser));
-            if (nameEl) nameEl.textContent = updatedUser.username || 'Utilisateur';
-            if (emailEl) emailEl.textContent = updatedUser.email || '';
-            if (accountStatus) {
-              accountStatus.textContent = 'Profil mis à jour avec succès.';
-              accountStatus.className = 'login-alert login-alert--success';
-              accountStatus.style.display = 'block';
-            }
-            accountForm.reset();
-            if (inputName) inputName.value = updatedUser.username || '';
-            if (inputEmail) inputEmail.value = updatedUser.email || '';
-          }
+        const { user: updatedUser, error } = await window.updateUserProfile(user.id, {
+          username,
+          email,
+          password: password || undefined,
         });
-      }
-    })();
+
+        if (submitBtn) submitBtn.disabled = false;
+
+        if (error) {
+          showAccountStatus(error.message || 'Erreur lors de la mise à jour.', 'error'); return;
+        }
+
+        if (updatedUser) {
+          localStorage.setItem('cookimeUser', JSON.stringify(updatedUser));
+          if (nameEl)     nameEl.textContent  = updatedUser.username || 'Utilisateur';
+          if (emailEl)    emailEl.textContent = updatedUser.email    || '';
+          if (inputName)  inputName.value     = updatedUser.username || '';
+          if (inputEmail) inputEmail.value    = updatedUser.email    || '';
+          showAccountStatus('Profil mis à jour avec succès.', 'success');
+        }
+      });
+    }
   }
+
+  // ============================================================
+  // PARAMS URL (erreurs serveur)
+  // ============================================================
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('error') === '1') {
+    const alertError = document.getElementById('alertError');
+    const alertMsg   = document.getElementById('alertMsg');
+    if (alertError) alertError.style.display = 'flex';
+    if (alertMsg)   alertMsg.textContent = 'Email ou mot de passe incorrect.';
+  }
+  if (params.get('success') === '1') {
+    const alertSuccess = document.getElementById('alertSuccess');
+    if (alertSuccess) alertSuccess.style.display = 'flex';
+  }
+
 });
