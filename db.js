@@ -448,9 +448,6 @@ window.updatePost = updatePost;
 window.logoutSupabase = logoutSupabase;
 window.getCurrentUser = getCurrentUser;
 window.getLikes = getLikes;
-<<<<<<< HEAD
-window.toggleLike = toggleLike;
-=======
 window.toggleLike = toggleLike;
 window.db = {
   getComments,
@@ -458,4 +455,3 @@ window.db = {
   deleteComment,
   updateComment,
 };
->>>>>>> e515b2e1883499c1cd032f4c5e58c84892c8d201
