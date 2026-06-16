@@ -1,0 +1,50 @@
+﻿
+.deco-facts {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.deco-facts li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fact-jp {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--shiro);
+  letter-spacing: .08em;
+}
+
+.fact-fr {
+  font-size: .72rem;
+  color: rgba(255,255,255,.65);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.deco-torii {
+  font-size: 3rem;
+  opacity: .45;
+  position: relative;
+  z-index: 1;
+  align-self: flex-end;
+}
+
+.login-card {
+  flex: 1;
+  background: var(--shiro);
+  border-radius: 0 var(--r) var(--r) 0;
+  padding: 40px 44px 36px;
+  box-shadow: var(--shadow-deep);
+  border: 1px solid rgba(200,117,58,.15);
+  border-left: none;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;

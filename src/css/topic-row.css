@@ -1,0 +1,50 @@
+﻿  text-overflow: ellipsis;
+  transition: color .15s;
+}
+
+.topic-row:hover .topic-title { color: var(--akane); }
+
+.topic-meta {
+  font-size: .72rem;
+  color: var(--cha);
+  margin-top: 2px;
+  letter-spacing: .04em;
+}
+
+.topic-replies {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--cha);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.topic-replies span {
+  display: block;
+  font-size: .65rem;
+  font-weight: 400;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  opacity: .7;
+}
+
+.topic-tag {
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  letter-spacing: .05em;
+  white-space: nowrap;
+}
+
+.tag-new    { background: rgba(217,79,61,.12); color: var(--akane); }
+.tag-hot    { background: rgba(200,117,58,.15); color: var(--kaki); }
+.tag-guide  { background: rgba(107,163,168,.15); color: var(--mizu); }
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   ARTICLE Ã‰PINGLÃ‰ / HERO POST
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.hero-post {
+  background: var(--shiro);
+  border-radius: var(--r);
+  overflow: hidden;

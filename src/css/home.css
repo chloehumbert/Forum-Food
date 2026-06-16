@@ -1,0 +1,199 @@
+/* ═══════════════════════════════════════════
+   LAYOUT PRINCIPAL — Accueil Cookime
+════════════════════════════════════════════ */
+.page-wrap {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 28px;
+  align-items: start;
+}
+
+/* ═══════════════════════════════════════════
+   HERO POST — Article épinglé
+════════════════════════════════════════════ */
+.hero-post {
+  background: var(--shiro);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: var(--shadow-deep);
+  margin-bottom: 28px;
+  border: 1px solid rgba(200,117,58,.2);
+  position: relative;
+}
+
+.hero-post-banner {
+  height: 160px;
+  background: linear-gradient(135deg, #7B2D1E 0%, #C8521A 50%, #E8A830 100%);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 20px 24px;
+  overflow: hidden;
+}
+
+.hero-post-banner::before {
+  content: '⛩';
+  position: absolute;
+  right: 24px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 90px;
+  opacity: .18;
+}
+
+.hero-post-banner .pin-badge {
+  background: var(--kogane);
+  color: var(--kuro);
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.hero-post-body {
+  padding: 20px 24px 22px;
+}
+
+.hero-post-body h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--sumi);
+  line-height: 1.35;
+  margin-bottom: 10px;
+}
+
+.hero-post-body p {
+  font-size: .88rem;
+  color: var(--cha);
+  line-height: 1.75;
+}
+
+/* ═══════════════════════════════════════════
+   BOARD TITLE — Titre "Voir les posts"
+════════════════════════════════════════════ */
+.board-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.board-title h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--sumi);
+  letter-spacing: .05em;
+}
+
+.kanji-tag {
+  font-family: 'Shippori Mincho', serif;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--shiro);
+  background: var(--akane);
+  padding: 3px 10px 2px;
+  border-radius: 4px;
+  letter-spacing: .1em;
+}
+
+/* ═══════════════════════════════════════════
+   FORUM CATEGORY — Bloc catégorie
+════════════════════════════════════════════ */
+.forum-category {
+  background: var(--shiro);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: var(--shadow-warm);
+  margin-bottom: 22px;
+  border: 1px solid rgba(200,117,58,.15);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  background: linear-gradient(90deg, var(--akane), var(--kaki));
+  color: var(--shiro);
+}
+
+.topic-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(200,117,58,.1);
+  transition: background .18s;
+  cursor: pointer;
+}
+
+.topic-row:hover {
+  background: rgba(232,168,48,.06);
+}
+
+.topic-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--kogane);
+  box-shadow: 0 0 6px rgba(232,168,48,.5);
+}
+
+.topic-dot.new {
+  background: var(--akane);
+  box-shadow: 0 0 6px rgba(217,79,61,.6);
+}
+
+/* ═══════════════════════════════════════════
+   SIDEBAR — À propos de Cookime
+════════════════════════════════════════════ */
+.sidebar-widget {
+  background: var(--shiro);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: var(--shadow-warm);
+  margin-bottom: 22px;
+  border: 1px solid rgba(200,117,58,.15);
+}
+
+.widget-header {
+  padding: 12px 18px;
+  background: linear-gradient(90deg, var(--sumi), #6B3E25);
+  color: var(--shiro);
+  font-family: 'Shippori Mincho', serif;
+  font-size: .95rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.widget-body {
+  padding: 16px 18px;
+}
+
+.widget-body p {
+  font-size: .85rem;
+  color: var(--cha);
+  margin-bottom: 12px;
+}
+
+.info-list {
+  list-style: none;
+}
+
+.info-list li {
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(200,117,58,.1);
+  font-size: .83rem;
+  color: var(--cha);
+}
+
+.info-list li:last-child {
+  border-bottom: none;
+}
+

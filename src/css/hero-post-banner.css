@@ -1,0 +1,50 @@
+﻿  box-shadow: var(--shadow-deep);
+  margin-bottom: 28px;
+  border: 1px solid rgba(200,117,58,.2);
+  position: relative;
+}
+
+.hero-post-banner {
+  height: 160px;
+  background: linear-gradient(135deg, #7B2D1E 0%, #C8521A 50%, #E8A830 100%);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 20px 24px;
+  overflow: hidden;
+}
+
+.hero-post-banner::before {
+  content: 'â›©';
+  position: absolute;
+  right: 24px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 90px;
+  opacity: .18;
+}
+
+.hero-post-banner .pin-badge {
+  background: var(--kogane);
+  color: var(--kuro);
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.hero-post-body { padding: 20px 24px 22px; }
+
+.hero-post-body h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--sumi);
+  line-height: 1.35;
+  margin-bottom: 10px;
+}
+
+.hero-post-body p {
+  font-size: .88rem;
+  color: var(--cha);

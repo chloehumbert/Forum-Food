@@ -1,0 +1,50 @@
+﻿  color: #f97316;
+  transform: translateY(-1px);
+}
+
+.dislike-btn:hover {
+  border-color: #6b7280;
+  color: #374151;
+  transform: translateY(-1px);
+}
+
+.like-btn.active {
+  background: #fff5ed;
+  border-color: #f97316;
+  color: #f97316;
+}
+
+.dislike-btn.active {
+  background: #f3f4f6;
+  border-color: #6b7280;
+  color: #374151;
+}
+
+
+
+.comment-toggle-btn {
+  margin-top: 12px;
+  padding: 8px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  background: #fff;
+  color: #555;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.comment-toggle-btn:hover {
+  border-color: #f97316;
+  color: #f97316;
+}
+
+.comment-section {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.comments-list {

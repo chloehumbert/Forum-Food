@@ -1,0 +1,50 @@
+﻿
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   FORUM BOARD â€” CATÃ‰GORIES
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.board-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.board-title h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--sumi);
+  letter-spacing: .05em;
+}
+
+.board-title .kanji-tag {
+  font-family: 'Shippori Mincho', serif;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--shiro);
+  background: var(--akane);
+  padding: 3px 10px 2px;
+  border-radius: 4px;
+  letter-spacing: .1em;
+}
+
+.forum-category {
+  background: var(--shiro);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: var(--shadow-warm);
+  margin-bottom: 22px;
+  border: 1px solid rgba(200,117,58,.15);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  background: linear-gradient(90deg, var(--akane), var(--kaki));
+  color: var(--shiro);
+}
+
+.category-header .icon {
+  font-size: 1.6rem;

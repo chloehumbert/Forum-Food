@@ -1,0 +1,50 @@
+﻿nav ul {
+  display: flex;
+  list-style: none;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 32px;
+  gap: 2px;
+}
+
+nav ul li a {
+  display: block;
+  padding: 14px 20px;
+  font-size: .88rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.7);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  transition: background .2s, color .2s;
+  position: relative;
+}
+
+nav ul li a:hover,
+nav ul li a.active {
+  color: var(--kogane);
+  background: rgba(232,168,48,.08);
+}
+
+nav ul li a.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: var(--kogane);
+  border-radius: 2px 2px 0 0;
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   LAYOUT PRINCIPAL
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.page-wrap {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 28px;
+  align-items: start;
+}

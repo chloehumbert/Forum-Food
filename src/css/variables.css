@@ -1,0 +1,50 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Zen+Maru+Gothic:wght@400;500;700&family=Shippori+Mincho:wght@400;600;800&display=swap');
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   VARIABLES â€” Palette chaleureuse anime
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+:root {
+  --akane:     #D94F3D;   /* rouge torii */
+  --kaki:      #C8753A;   /* orange brique */
+  --kogane:    #E8A830;   /* or soleil couchant */
+  --sakura:    #F2B5A0;   /* rose sakura doux */
+  --shiro:     #FDFAF5;   /* blanc chaud parchemin */
+  --shiro2:    #FFF8F0;   /* blanc crÃ¨me */
+  --kuro:      #2A1A0E;   /* brun noir encre */
+  --sumi:      #4A2E1A;   /* sumi-e brun foncÃ© */
+  --cha:       #8B5E3C;   /* thÃ© brun */
+  --mizu:      #6BA3A8;   /* bleu-vert eau froide */
+  --accent-glow: rgba(216,79,61,.25);
+
+  --r: 12px;
+  --shadow-warm: 0 4px 20px rgba(200, 117, 58, .18);
+  --shadow-deep: 0 8px 40px rgba(42, 26, 14, .22);
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   RESET & BASE
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Zen Maru Gothic', 'Noto Serif JP', serif;
+  background-color: #F5EDE0;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(232,168,48,.15) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8753a' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  color: var(--kuro);
+  min-height: 100vh;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   HEADER / BANNIÃˆRE
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+header {
+  position: relative;
+  background: linear-gradient(135deg, var(--akane) 0%, var(--kaki) 45%, var(--kogane) 100%);
+  padding: 0;
+  overflow: hidden;

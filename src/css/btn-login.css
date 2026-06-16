@@ -1,0 +1,50 @@
+﻿  transition: opacity .25s;
+}
+
+.btn-login:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 24px rgba(217,79,61,.45);
+}
+
+.btn-login:hover:not(:disabled)::before { opacity: 1; }
+
+.btn-login:disabled {
+  opacity: .7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-login-text,
+.btn-login-jp {
+  position: relative;
+  z-index: 1;
+  transition: opacity .2s;
+}
+
+.btn-login-jp {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.1rem;
+  opacity: .7;
+}
+
+.btn-login-spinner {
+  position: relative;
+  z-index: 1;
+  font-size: 1.2rem;
+  animation: spin .7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.login-sep {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 16px;
+}
+
+.login-sep span:not(.sep-text) {
+  flex: 1;
+  height: 1px;

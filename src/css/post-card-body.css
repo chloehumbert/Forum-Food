@@ -1,0 +1,50 @@
+﻿.post-card-body { padding: 18px; 
+  color: var(--cha); 
+  line-height: 1.75; 
+  font-size: .70rem;
+  white-space: pre-wrap;  /* âœ… Ajoute Ã§a */
+  word-wrap: break-word; }
+.empty-feed { padding:20px; font-size:.92rem; color:var(--cha); }
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   ACCOUNT
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+.account-card { max-width:800px; margin:36px auto; padding:20px; background:var(--shiro); border-radius:var(--r); box-shadow:var(--shadow-warm); border:1px solid rgba(200,117,58,.12); }
+.account-header { display:flex; gap:18px; align-items:center; margin-bottom:18px; }
+.account-avatar { width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,var(--akane),var(--kaki)); display:flex; align-items:center; justify-content:center; color:var(--shiro); font-weight:900; font-size:1.6rem; }
+.account-meta { font-family:'Shippori Mincho', serif; color:var(--sumi); }
+.account-meta .name { font-size:1.1rem; font-weight:800; }
+.account-meta .email { font-size:.9rem; color:var(--cha); }
+.account-actions { display:flex; gap:12px; margin-top:12px; }
+.account-actions a, .account-actions button { text-decoration:none; padding:10px 16px; border-radius:10px; border:none; cursor:pointer; font-weight:700; }
+.btn-edit { background:linear-gradient(135deg,var(--akane),var(--kaki)); color:#fff; }
+.btn-logout { background:transparent; color:var(--sumi); border:1px solid rgba(200,117,58,.12); }
+.btn-login { background:linear-gradient(135deg,var(--akane),var(--kaki)); color:#fff; }
+.account-section { margin-top:20px; }
+.field { display:block; margin-bottom:12px; }
+.field label { display:block; font-weight:700; margin-bottom:6px; }
+.field input { width:100%; padding:12px; border-radius:10px; border:1px solid rgba(200,117,58,.12); background:var(--shiro2); }
+
+#my-posts .post-card {
+    background: var(--shiro);
+    border-radius: var(--r);
+    box-shadow: var(--shadow-warm);
+    border: 1px solid rgba(200,117,58,.12);
+
+    padding: 20px;
+    margin-bottom: 18px;
+}
+
+#my-posts .post-card h4 {
+    color: var(--sumi);
+    font-family: 'Shippori Mincho', serif;
+    margin-bottom: 10px;
+}
+
+#my-posts .post-card p {
+    color: var(--cha);
+    line-height: 1.6;
+}
+
+.delete-post {

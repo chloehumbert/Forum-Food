@@ -1,0 +1,50 @@
+﻿  line-height: 1;
+}
+
+.category-header h3 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+
+.category-header .jp {
+  margin-left: auto;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.2rem;
+  opacity: .7;
+}
+
+.topic-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(200,117,58,.1);
+  transition: background .18s;
+  cursor: pointer;
+}
+
+.topic-row:last-child { border-bottom: none; }
+.topic-row:hover { background: rgba(232,168,48,.06); }
+
+.topic-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--kogane);
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(232,168,48,.5);
+}
+
+.topic-dot.new { background: var(--akane); box-shadow: 0 0 6px rgba(217,79,61,.6); }
+.topic-dot.hot { background: var(--kaki); box-shadow: 0 0 6px rgba(200,117,58,.6); }
+
+.topic-info { min-width: 0; }
+
+.topic-title {
+  font-size: .92rem;
+  font-weight: 700;
+  color: var(--sumi);
+  white-space: nowrap;
+  overflow: hidden;

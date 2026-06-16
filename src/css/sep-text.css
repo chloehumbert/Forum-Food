@@ -1,0 +1,50 @@
+﻿  background: rgba(200,117,58,.2);
+}
+
+.sep-text {
+  font-size: .75rem;
+  color: var(--cha);
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.register-link {
+  text-align: center;
+  font-size: .82rem;
+  color: var(--cha);
+  margin-bottom: 10px;
+}
+
+.register-link a {
+  color: var(--akane);
+  font-weight: 700;
+  transition: color .15s;
+}
+
+.register-link a:hover { color: var(--kaki); }
+
+.back-link {
+  display: block;
+  text-align: center;
+  font-size: .78rem;
+  color: var(--cha);
+  font-weight: 600;
+  margin-top: auto;
+  padding-top: 14px;
+  transition: color .15s;
+  letter-spacing: .04em;
+}
+
+.back-link:hover { color: var(--sumi); }
+
+@media (max-width: 720px) {
+  .login-wrapper {
+    flex-direction: column;
+    margin: 24px auto;
+  }
+
+  .login-deco {
+    flex: none;
+    width: 100%;
+    min-height: auto;

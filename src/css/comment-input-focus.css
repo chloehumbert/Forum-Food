@@ -1,0 +1,50 @@
+﻿}
+
+.comment-input:focus {
+  outline: none;
+  border-color: var(--kaki);
+  box-shadow: 0 0 0 3px rgba(200,117,58,.1);
+}
+
+.comment-submit {
+  align-self: flex-end;
+  padding: 0.45rem 1.1rem;
+  background: linear-gradient(135deg, var(--akane), var(--kaki));
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: .88rem;
+  transition: transform .15s, box-shadow .15s;
+}
+
+.comment-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(217,79,61,.3);
+}
+
+.comment-submit:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.no-comments {
+  color: var(--cha);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+
+
+.my-post-card {
+  background: #fff;
+  border: 1px solid #e8e0d5;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.my-post-card-title   { font-weight: 700; color: #3d2b1f; margin-bottom: 4px; }
+.my-post-card-meta    { font-size: 0.8rem; color: #a08060; margin-bottom: 8px; }

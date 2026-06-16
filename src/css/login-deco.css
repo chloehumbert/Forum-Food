@@ -1,0 +1,50 @@
+﻿  overflow: hidden;
+  box-shadow: var(--shadow-deep);
+}
+
+.login-deco::before {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  border: 40px solid rgba(255,255,255,.06);
+  top: -80px; right: -100px;
+}
+
+.login-deco::after {
+  content: '';
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  border: 25px solid rgba(255,255,255,.05);
+  bottom: -50px; left: -60px;
+}
+
+.deco-kanji {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 5rem;
+  font-weight: 900;
+  color: rgba(255,255,255,.15);
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.deco-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.deco-lines span {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255,255,255,.35);
+}
+
+.deco-lines span:nth-child(1) { width: 80px; }
+.deco-lines span:nth-child(2) { width: 50px; }
+.deco-lines span:nth-child(3) { width: 65px; }

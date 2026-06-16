@@ -1,0 +1,50 @@
+﻿  margin-top: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 14px 24px;
+
+  background: linear-gradient(135deg, var(--akane), var(--kaki));
+  border: none;
+  border-radius: 8px;
+
+  color: white;
+  font-family: 'Zen Maru Gothic', serif;
+  font-size: .95rem;
+  font-weight: 700;
+
+  cursor: pointer;
+  letter-spacing: .06em;
+
+  box-shadow: 0 4px 18px rgba(217,79,61,.35);
+  transition: transform .15s, box-shadow .15s;
+
+  overflow: hidden;
+}
+
+.delete-post::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--kaki), var(--kogane));
+  opacity: 0;
+  transition: opacity .25s;
+}
+
+.delete-post:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 24px rgba(217,79,61,.45);
+}
+
+.delete-post:hover::before {
+  opacity: 1;
+}
+
+.delete-post span {
+  position: relative;
+  z-index: 1;
+}
+

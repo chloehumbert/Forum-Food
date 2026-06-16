@@ -1,0 +1,50 @@
+﻿  cursor: pointer;
+  font-size: .95rem;
+  color: var(--cha);
+  transition: color .15s;
+  flex-shrink: 0;
+}
+
+.field-toggle:hover { color: var(--akane); }
+
+.field-error {
+  font-size: .74rem;
+  color: var(--akane);
+  font-weight: 600;
+  min-height: 1em;
+  padding-left: 4px;
+}
+
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: .8rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--cha);
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] { display: none; }
+
+.checkbox-custom {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(200,117,58,.4);
+  border-radius: 4px;
+  background: var(--shiro2);
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color .18s, background .18s;
+}
+
+.checkbox-label input:checked + .checkbox-custom {
+  background: var(--akane);
+  border-color: var(--akane);
+}

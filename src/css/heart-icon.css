@@ -1,0 +1,50 @@
+﻿  z-index: 1;
+}
+
+.heart-icon {
+  font-size: 1.4rem;
+  color: #888;
+  transition: 0.2s;
+}
+
+.heart-icon.active {
+  color: #e63946;
+  transform: scale(1.15);
+}
+
+.like-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
+ .like-btn.active .heart-icon {
+  color: #e63946;
+}
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   COMMENTAIRES
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+.comment-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--akane);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 700;
+  transition: background 0.2s;
+}
+
+.comment-toggle-btn:hover {
+  background: rgba(200,117,58,.08);
+}

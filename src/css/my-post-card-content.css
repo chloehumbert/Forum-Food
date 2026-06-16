@@ -1,0 +1,50 @@
+﻿.my-post-card-content { font-size: 0.9rem; color: #5a4030; margin-bottom: 12px; white-space: pre-wrap; }
+.my-post-card-actions { display: flex; gap: 10px; margin-bottom: 8px; }
+
+.btn-edit-post, .btn-delete-post {
+  padding: 6px 14px; border-radius: 8px; border: none;
+  cursor: pointer; font-size: 0.85rem; font-weight: 600;
+}
+.btn-edit-post   { background: #f0e6d3; color: #7a4f2e; }
+.btn-delete-post { background: #fde8e8; color: #c0392b; }
+.btn-edit-post:hover, .btn-delete-post:hover { opacity: 0.75; }
+
+.edit-post-form   { border-top: 1px solid #e8e0d5; margin-top: 12px; padding-top: 12px; }
+.edit-form-btns   { display: flex; gap: 10px; margin-top: 10px; }
+.btn-save-post    { background: #c8a96e; color: #fff; border: none; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-cancel-edit  { background: #eee; color: #555; border: none; padding: 7px 16px; border-radius: 8px; cursor: pointer; }
+.no-posts         { color: #a08060; font-style: italic; }
+
+
+.post-like-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.like-btn,
+.dislike-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  background: #fff;
+  color: #555;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.like-btn span,
+.dislike-btn span {
+  font-weight: 700;
+}
+
+.like-btn:hover {
+  border-color: #f97316;

@@ -1,0 +1,50 @@
+﻿  line-height: 1.75;
+}
+
+.hero-post-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  background: rgba(200,117,58,.06);
+  border-top: 1px solid rgba(200,117,58,.12);
+}
+
+.avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--akane), var(--kogane));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+  font-weight: 900; color: white;
+  border: 2px solid rgba(255,255,255,.6);
+}
+
+.post-author { font-size: .82rem; font-weight: 700; color: var(--sumi); }
+.post-date   { font-size: .75rem; color: var(--cha); margin-top: 1px; }
+.post-stats  { margin-left: auto; display: flex; gap: 14px; }
+
+.post-stats span {
+  font-size: .78rem;
+  color: var(--cha);
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   SIDEBAR
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sidebar-widget {
+  background: var(--shiro);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: var(--shadow-warm);
+  margin-bottom: 22px;
+  border: 1px solid rgba(200,117,58,.15);
+}
+
+.widget-header {
+  padding: 12px 18px;
+  background: linear-gradient(90deg, var(--sumi), #6B3E25);
+  color: var(--shiro);
+  font-family: 'Shippori Mincho', serif;
+  font-size: .95rem;

@@ -1,0 +1,50 @@
+﻿  font-size: .83rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  animation: fadeUp .3s ease both;
+}
+
+.login-alert--error {
+  background: rgba(217,79,61,.1);
+  border: 1px solid rgba(217,79,61,.3);
+  color: var(--akane);
+}
+
+.login-alert--success {
+  background: rgba(107,163,168,.12);
+  border: 1px solid rgba(107,163,168,.35);
+  color: #3A7E84;
+}
+
+.alert-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .83rem;
+  font-weight: 700;
+  color: var(--sumi);
+  cursor: pointer;
+}
+
+.field-label-jp {
+  font-family: 'Shippori Mincho', serif;
+  font-size: .9rem;
+  color: var(--akane);
+  font-weight: 700;
