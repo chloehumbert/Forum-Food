@@ -54,9 +54,6 @@ PROJET-FORUM
     │
     ├── src
     │   ├── css
-<<<<<<< HEAD
-    │   │   └── style.css
-=======
     │   │   ├── variables.css
     │   │   ├── style.css
     │   │   ├── responsive.css
@@ -101,7 +98,6 @@ PROJET-FORUM
     │   │   ├── pagination.css
     │   │   ├── member-chip.css
     │   │   ├── sep-text.css
->>>>>>> 1b0783767f32b91cb84ddb720b115e12ccdfb60a
     │   │
     │   ├── html
     │   │   ├── account.html
@@ -124,10 +120,7 @@ PROJET-FORUM
     └── server.go
 
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 1b0783767f32b91cb84ddb720b115e12ccdfb60a
 Fonctions clés 
 
 - La fonction createPost() — enregistrer une nouvelle publication dans la base de données.
@@ -156,11 +149,7 @@ L’utilisation de Supabase simplifie l’authentification et la persistance des
 Qualité & fonctionnalités principales
 Le site propose plusieurs fonctionnalités permettant une expérience fluide :
 
-<<<<<<< HEAD
-📝 Publications de posts
-=======
     Publications de posts
->>>>>>> 1b0783767f32b91cb84ddb720b115e12ccdfb60a
 Les utilisateurs peuvent créer des posts contenant :
 
 un titre
@@ -183,11 +172,7 @@ chargement dynamique des commentaires
 ajout de nouveaux commentaires
 affichage de l’auteur et de la date
 
-<<<<<<< HEAD
-👍 Likes
-=======
      Likes
->>>>>>> 1b0783767f32b91cb84ddb720b115e12ccdfb60a
 Les utilisateurs peuvent liker un post.
 Le système fonctionne comme un interrupteur :
 like si l’utilisateur n’a pas encore liké
@@ -213,8 +198,4 @@ Pas de système de notifications (likes, réponses, etc.)
 
 👥 Crédits & licence
 Développé par :
-<<<<<<< HEAD
 Humbert Chloé , Chochon Elsa , Fatoux-Della Posta Alexandre
-=======
-Humbert Chloé , Chochon Elsa , Fatoux-Della Posta Alexandre
->>>>>>> 1b0783767f32b91cb84ddb720b115e12ccdfb60a
