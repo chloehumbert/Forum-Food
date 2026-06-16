@@ -12,6 +12,17 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
   }
 
+  function escapeHtml(text) {
+    const map = {
+      '&': '&',
+      '<': '<',
+      '>': '>',
+      '"': '"',
+      "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+  }
+
   async function getLoggedUser() {
     if (!window.getCurrentUser) return null;
     const { user } = await window.getCurrentUser();
@@ -24,7 +35,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   const loginLink  = document.getElementById('loginLink');
   const logoutLink = document.getElementById('logoutLink');
-
   const currentUser = await getLoggedUser();
 
   if (loginLink)  loginLink.hidden  = Boolean(currentUser);
@@ -126,7 +136,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
       }
 
-      // Affichage des boutons
       function renderButtons() {
         likeBtn.innerHTML = `❤️ <span>${likesCount}</span>`;
         dislikeBtn.innerHTML = `💔 <span>${dislikesCount}</span>`;
@@ -136,7 +145,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
       renderButtons();
 
-      // Gestion du vote
       async function handleVote(type) {
         if (!userObj) {
           showStatus('Connectez-vous pour voter.', 'error');
@@ -184,9 +192,10 @@ document.addEventListener('DOMContentLoaded', async function () {
       likeBar.appendChild(dislikeBtn);
       card.appendChild(likeBar);
 
-     // -------------------------------------------------------
-      // Section commentaires (toggle, CRUD complet)
-      // -------------------------------------------------------
+      // ============================================================
+      // 💬 SECTION COMMENTAIRES
+      // ============================================================
+
       const commentToggle = document.createElement('button');
       commentToggle.className = 'comment-toggle-btn';
       commentToggle.innerHTML = `💬 <span class="comment-toggle-label">Commentaires</span>`;
@@ -195,11 +204,9 @@ document.addEventListener('DOMContentLoaded', async function () {
       commentSection.className = 'comment-section';
       commentSection.style.display = 'none';
 
-      // Liste des commentaires
       const commentsList = document.createElement('div');
       commentsList.className = 'comments-list';
 
-      // Formulaire d'envoi
       const commentForm = document.createElement('form');
       commentForm.className = 'comment-form';
       commentForm.innerHTML = `
@@ -210,14 +217,18 @@ document.addEventListener('DOMContentLoaded', async function () {
       commentSection.appendChild(commentsList);
       commentSection.appendChild(commentForm);
 
-      // Charger et afficher les commentaires du post
+      // Charger les commentaires
       async function loadComments() {
-        if (!window.db?.getComments) return;
-        const comments = await window.db.getComments(post.id);
+        if (!window.getComments) {
+          commentsList.innerHTML = '<p class="no-comments">Fonctionnalité indisponible.</p>';
+          return;
+        }
+
+        const comments = await window.getComments(post.id);
         commentsList.innerHTML = '';
 
         if (!comments || comments.length === 0) {
-          commentsList.innerHTML = '<p class="no-comments">Aucun commentaire.</p>';
+          commentsList.innerHTML = '<p class="no-comments">Aucun commentaire. Soyez le premier !</p>';
           return;
         }
 
@@ -230,108 +241,138 @@ document.addEventListener('DOMContentLoaded', async function () {
 
           div.innerHTML = `
             <div class="comment-item-header">
-              <strong>${c.author || 'Anonyme'}</strong>
+              <strong class="comment-author">${c.author || 'Anonyme'}</strong>
               <span class="comment-date">${formatTime(c.created_at || c.date)}</span>
             </div>
-            <p class="comment-content">${c.content}</p>
+            <p class="comment-content">${escapeHtml(c.content)}</p>
             ${isOwner ? `
               <div class="comment-actions">
                 <button class="btn-edit-comment" data-id="${c.id}">✏️ Modifier</button>
                 <button class="btn-delete-comment" data-id="${c.id}">🗑️ Supprimer</button>
               </div>
               <div class="comment-edit-form" id="comment-edit-${c.id}" style="display:none;">
-                <textarea class="comment-edit-input" rows="2">${c.content}</textarea>
+                <textarea class="comment-edit-input" rows="3" data-id="${c.id}">${escapeHtml(c.content)}</textarea>
                 <div class="comment-edit-actions">
-                  <button class="btn-save-comment" data-id="${c.id}">💾 Enregistrer</button>
-                  <button class="btn-cancel-comment" data-id="${c.id}">✖ Annuler</button>
+                  <button type="button" class="btn-save-comment" data-id="${c.id}">💾 Enregistrer</button>
+                  <button type="button" class="btn-cancel-comment" data-id="${c.id}">✖ Annuler</button>
                 </div>
+                <p class="comment-edit-status" style="display:none;"></p>
               </div>
             ` : ''}
           `;
 
           commentsList.appendChild(div);
         });
+
+        // Attacher les événements après le rendu
+        attachCommentEvents();
       }
 
-      // Délégation d'événements pour modifier/supprimer un commentaire
-      commentsList.addEventListener('click', async (e) => {
+      // Gestion des événements commentaires
+      function attachCommentEvents() {
+        // 📝 MODIFIER COMMENTAIRE
+        commentsList.querySelectorAll('.btn-edit-comment').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const commentId = btn.dataset.id;
+            const form = document.getElementById(`comment-edit-${commentId}`);
+            if (form) {
+              form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            }
+          });
+        });
 
-        // SUPPRIMER
-        if (e.target.closest('.btn-delete-comment')) {
-          const btn = e.target.closest('.btn-delete-comment');
-          const commentId = btn.dataset.id;
-          if (!confirm('Supprimer ce commentaire ?')) return;
+        // ✖️ ANNULER ÉDITION
+        commentsList.querySelectorAll('.btn-cancel-comment').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const commentId = btn.dataset.id;
+            const form = document.getElementById(`comment-edit-${commentId}`);
+            if (form) form.style.display = 'none';
+          });
+        });
 
-          btn.disabled = true;
-          const { error } = await window.db.deleteComment(commentId);
+        // 💾 SAUVEGARDER COMMENTAIRE
+        commentsList.querySelectorAll('.btn-save-comment').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const commentId = btn.dataset.id;
+            const form = document.getElementById(`comment-edit-${commentId}`);
+            const textarea = form?.querySelector('.comment-edit-input');
+            const newContent = textarea?.value.trim();
+            const status = form?.querySelector('.comment-edit-status');
 
-          if (error) {
-            btn.disabled = false;
-            showStatus('Erreur lors de la suppression du commentaire.', 'error');
-            return;
-          }
+            if (!newContent) {
+              if (status) {
+                status.textContent = 'Le commentaire ne peut pas être vide.';
+                status.className = 'login-alert login-alert--error';
+                status.style.display = 'block';
+              }
+              return;
+            }
 
-          const item = commentsList.querySelector(`.comment-item[data-id="${commentId}"]`);
-          if (item) item.remove();
-          if (commentsList.querySelectorAll('.comment-item').length === 0) {
-            commentsList.innerHTML = '<p class="no-comments">Aucun commentaire.</p>';
-          }
-        }
+            btn.disabled = true;
+            btn.textContent = '⏳';
 
-        // OUVRIR/FERMER LE FORMULAIRE D'ÉDITION
-        if (e.target.closest('.btn-edit-comment')) {
-          const commentId = e.target.closest('.btn-edit-comment').dataset.id;
-          const form = document.getElementById(`comment-edit-${commentId}`);
-          if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        }
+            if (window.updateComment) {
+              const { error } = await window.updateComment(commentId, newContent);
 
-        // ANNULER L'ÉDITION
-        if (e.target.closest('.btn-cancel-comment')) {
-          const commentId = e.target.closest('.btn-cancel-comment').dataset.id;
-          const form = document.getElementById(`comment-edit-${commentId}`);
-          if (form) form.style.display = 'none';
-        }
+              if (error) {
+                if (status) {
+                  status.textContent = 'Erreur lors de la modification.';
+                  status.className = 'login-alert login-alert--error';
+                  status.style.display = 'block';
+                }
+                btn.disabled = false;
+                btn.textContent = '💾 Enregistrer';
+              } else {
+                if (status) {
+                  status.textContent = 'Commentaire modifié !';
+                  status.className = 'login-alert login-alert--success';
+                  status.style.display = 'block';
+                }
+                setTimeout(() => {
+                  form.style.display = 'none';
+                  loadComments();
+                }, 800);
+              }
+            }
+          });
+        });
 
-        // ENREGISTRER LA MODIFICATION
-        if (e.target.closest('.btn-save-comment')) {
-          const btn = e.target.closest('.btn-save-comment');
-          const commentId = btn.dataset.id;
-          const form = document.getElementById(`comment-edit-${commentId}`);
-          const textarea = form?.querySelector('.comment-edit-input');
-          const newContent = textarea?.value.trim();
+        // 🗑️ SUPPRIMER COMMENTAIRE
+        commentsList.querySelectorAll('.btn-delete-comment').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const commentId = btn.dataset.id;
 
-          if (!newContent) {
-            showStatus('Le commentaire ne peut pas être vide.', 'error');
-            return;
-          }
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) return;
 
-          btn.disabled = true;
-          const { data, error } = await window.db.updateComment(commentId, newContent);
-          btn.disabled = false;
+            btn.disabled = true;
+            btn.textContent = '⏳';
 
-          if (error || !data) {
-            showStatus('Erreur lors de la mise à jour du commentaire.', 'error');
-            return;
-          }
+            if (window.deleteComment) {
+              const { error } = await window.deleteComment(commentId);
 
-          const item = commentsList.querySelector(`.comment-item[data-id="${commentId}"]`);
-          if (item) item.querySelector('.comment-content').textContent = newContent;
-          if (form) form.style.display = 'none';
-        }
-      });
+              if (error) {
+                showStatus('Erreur lors de la suppression.', 'error');
+                btn.disabled = false;
+                btn.textContent = '🗑️ Supprimer';
+              } else {
+                showStatus('Commentaire supprimé.', 'success');
+                loadComments();
+              }
+            }
+          });
+        });
+      }
 
-      // Toggle ouverture/fermeture de la section
-      commentToggle.addEventListener('click', async () => {
-        const isOpen = commentSection.style.display !== 'none';
-        commentSection.style.display = isOpen ? 'none' : 'block';
-        if (!isOpen) await loadComments();
-      });
-
-      // Soumission d'un nouveau commentaire
+      // Soumission du formulaire de commentaire
       commentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const textarea = commentForm.querySelector('.comment-input');
         const text = textarea.value.trim();
+
         if (!text) return;
 
         if (!userObj) {
@@ -340,20 +381,31 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         const submitBtn = commentForm.querySelector('.comment-submit');
-        if (submitBtn) submitBtn.disabled = true;
+        submitBtn.disabled = true;
+        submitBtn.textContent = '⏳';
 
-        if (window.db?.createComment) {
-          const { error } = await window.db.createComment(post.id, text);
+        if (window.createComment) {
+          const { error } = await window.createComment(post.id, userObj.id, text);
 
           if (error) {
-            showStatus(error.message || 'Erreur lors de l\'envoi du commentaire.', 'error');
+            showStatus('Erreur lors de l\'envoi du commentaire.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Envoyer';
           } else {
             textarea.value = '';
+            showStatus('Commentaire ajouté !', 'success');
             await loadComments();
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Envoyer';
           }
         }
+      });
 
-        if (submitBtn) submitBtn.disabled = false;
+      // Toggle ouverture/fermeture
+      commentToggle.addEventListener('click', async () => {
+        const isOpen = commentSection.style.display !== 'none';
+        commentSection.style.display = isOpen ? 'none' : 'block';
+        if (!isOpen) await loadComments();
       });
 
       card.appendChild(commentToggle);
@@ -376,12 +428,14 @@ document.addEventListener('DOMContentLoaded', async function () {
     async function loadPosts() {
       if (!window.getPosts) return;
       const { data, error } = await window.getPosts();
-      if (error) { showStatus('Impossible de charger les publications.', 'error'); return; }
+      if (error) {
+        showStatus('Impossible de charger les publications.', 'error');
+        return;
+      }
       await renderPosts(data || []);
     }
 
     await loadPosts();
-
 
     // ============================================================
     // FILTRES CATÉGORIES
@@ -409,6 +463,9 @@ document.addEventListener('DOMContentLoaded', async function () {
       });
     }
 
+    // ============================================================
+    // CRÉATION DE POST
+    // ============================================================
     postForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -448,38 +505,38 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
           }
 
-          const { data: publicUrlData } = window.supabaseClient.storage
+          const { data: urlData } = window.supabaseClient.storage
             .from(STORAGE_BUCKET)
-            .getPublicUrl(uploadData.path);
+            .getPublicUrl(storagePath);
 
-          imageUrl = publicUrlData?.publicUrl || null;
+          imageUrl = urlData?.publicUrl || null;
         }
 
-        const { error } = await window.createPost({
-          user_id:    user.id,
-          title,
-          content,
-          category,
-          author:     user.username || user.email || 'Utilisateur',
-          date:       new Date().toISOString().slice(0, 10),
-          created_at: new Date().toISOString(),
-          image_url:  imageUrl,
-        });
+        if (window.createPost) {
+          const { error: postError } = await window.createPost({
+            title,
+            content,
+            category,
+            user_id: user.id,
+            author: user.username || user.email,
+            image_url: imageUrl
+          });
 
-        if (error) {
-          showStatus(error.message || 'Erreur lors de la publication.', 'error');
+          if (postError) {
+            showStatus('Erreur lors de la création du post : ' + postError.message, 'error');
+            if (submitBtn) submitBtn.disabled = false;
+            return;
+          }
+
+          showStatus('Post publié avec succès !', 'success');
+          postForm.reset();
+          await loadPosts();
           if (submitBtn) submitBtn.disabled = false;
-          return;
         }
-
-        showStatus('Post publié avec succès !', 'success');
-        postForm.reset();
-        await loadPosts();
       } catch (err) {
         showStatus('Une erreur est survenue.', 'error');
+        if (submitBtn) submitBtn.disabled = false;
       }
-
-      if (submitBtn) submitBtn.disabled = false;
     });
   }
 
@@ -558,29 +615,14 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   const registerForm = document.getElementById('registerForm');
   if (registerForm) {
-
-    function hideAlerts() {
-      const err = document.getElementById('alertError');
-      const suc = document.getElementById('alertSuccess');
-      if (err) err.style.display = 'none';
-      if (suc) suc.style.display = 'none';
+    const toggleRegPwd = document.getElementById('toggleRegPwd');
+    if (toggleRegPwd) {
+      toggleRegPwd.addEventListener('click', function () {
+        const input = document.getElementById('password');
+        input.type = input.type === 'password' ? 'text' : 'password';
+        this.textContent = input.type === 'password' ? '👁' : '🙈';
+      });
     }
-    function showError(msg) {
-      hideAlerts();
-      const err      = document.getElementById('alertError');
-      const alertMsg = document.getElementById('alertMsg');
-      if (err)      err.style.display    = 'flex';
-      if (alertMsg) alertMsg.textContent = msg;
-    }
-    function showSuccess(msg) {
-      hideAlerts();
-      const suc        = document.getElementById('alertSuccess');
-      const successMsg = document.getElementById('successMsg');
-      if (suc)        suc.style.display       = 'flex';
-      if (successMsg) successMsg.textContent  = msg;
-    }
-
-    hideAlerts();
 
     registerForm.addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -600,7 +642,6 @@ document.addEventListener('DOMContentLoaded', async function () {
       if (usernameErr) usernameErr.textContent = '';
       if (pwdErr)      pwdErr.textContent      = '';
       if (confirmErr)  confirmErr.textContent  = '';
-      hideAlerts();
 
       let valid = true;
       if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
@@ -631,13 +672,19 @@ document.addEventListener('DOMContentLoaded', async function () {
       );
 
       if (error || !user) {
-        showError(error?.message || 'Erreur lors de l\'inscription.');
+        const alertError = document.getElementById('alertError');
+        const alertMsg = document.getElementById('alertMsg');
+        if (alertError) alertError.style.display = 'flex';
+        if (alertMsg) alertMsg.textContent = error?.message || 'Erreur lors de l\'inscription.';
         if (spinner) spinner.hidden = true;
         if (btnText) btnText.style.opacity = '1';
         return;
       }
 
-      showSuccess('Compte créé avec succès ! Vous pouvez vous connecter.');
+      const alertSuccess = document.getElementById('alertSuccess');
+      const alertMsg = document.getElementById('alertMsg');
+      if (alertSuccess) alertSuccess.style.display = 'flex';
+      if (alertMsg) alertMsg.textContent = 'Compte créé avec succès ! Vous pouvez vous connecter.';
       if (spinner) spinner.hidden = true;
       if (btnText) btnText.style.opacity = '1';
       registerForm.reset();
@@ -648,274 +695,252 @@ document.addEventListener('DOMContentLoaded', async function () {
   // PAGE ACCOUNT
   // ============================================================
 
- // ============================================================
-// PAGE ACCOUNT
-// ============================================================
+  const accountCard = document.querySelector('.account-card');
+  if (accountCard) {
+    const nameEl        = document.querySelector('.account-meta .name');
+    const emailEl       = document.querySelector('.account-meta .email');
+    const inputName     = document.getElementById('display_name');
+    const inputEmail    = document.getElementById('email');
+    const accountForm   = document.getElementById('accountForm');
+    const accountStatus = document.getElementById('accountStatus');
+    const myPostsDiv    = document.getElementById('my-posts');
 
-const accountCard = document.querySelector('.account-card');
-if (accountCard) {
-  const nameEl        = document.querySelector('.account-meta .name');
-  const emailEl       = document.querySelector('.account-meta .email');
-  const inputName     = document.getElementById('display_name');
-  const inputEmail    = document.getElementById('email');
-  const accountForm   = document.getElementById('accountForm');
-  const accountStatus = document.getElementById('accountStatus');
-  const myPostsDiv    = document.getElementById('my-posts');
+    function showAccountStatus(msg, type) {
+      if (!accountStatus) return;
+      accountStatus.textContent = msg;
+      accountStatus.className = type === 'success'
+        ? 'login-alert login-alert--success'
+        : 'login-alert login-alert--error';
+      accountStatus.style.display = 'block';
+      setTimeout(() => { accountStatus.style.display = 'none'; }, 4000);
+    }
 
-  function showAccountStatus(msg, type) {
-    if (!accountStatus) return;
-    accountStatus.textContent = msg;
-    accountStatus.className = type === 'success'
-      ? 'login-alert login-alert--success'
-      : 'login-alert login-alert--error';
-    accountStatus.style.display = 'block';
-    setTimeout(() => { accountStatus.style.display = 'none'; }, 4000);
-  }
+    const user = await getLoggedUser();
 
-  const user = await getLoggedUser();
-
-  if (!user) {
-    if (nameEl)  nameEl.textContent  = 'Visiteur';
-    if (emailEl) emailEl.textContent = 'Connectez-vous pour gérer votre compte.';
-    showAccountStatus('Vous devez être connecté pour modifier votre profil.', 'error');
-    return;
-  }
-
-  if (nameEl)     nameEl.textContent  = user.username || 'Utilisateur';
-  if (emailEl)    emailEl.textContent = user.email    || '';
-  if (inputName)  inputName.value     = user.username || '';
-  if (inputEmail) inputEmail.value    = user.email    || '';
-
-  // ── Charger et afficher mes posts ──────────────────────────
-  async function loadMyPosts() {
-    if (!myPostsDiv || !window.getPosts) return;
-    myPostsDiv.innerHTML = '<p>Chargement...</p>';
-
-    const { data, error } = await window.getPosts();
-    if (error) {
-      myPostsDiv.innerHTML = '<p>Erreur de chargement.</p>';
+    if (!user) {
+      if (nameEl)  nameEl.textContent  = 'Visiteur';
+      if (emailEl) emailEl.textContent = 'Connectez-vous pour gérer votre compte.';
+      showAccountStatus('Vous devez être connecté pour modifier votre profil.', 'error');
       return;
     }
 
-    const myPosts = (data || []).filter(p =>
-      p.user_id === user.id ||
-      p.author  === user.username ||
-      p.author  === user.email
-    );
+    if (nameEl)     nameEl.textContent  = user.username || 'Utilisateur';
+    if (emailEl)    emailEl.textContent = user.email    || '';
+    if (inputName)  inputName.value     = user.username || '';
+    if (inputEmail) inputEmail.value    = user.email    || '';
 
-    if (myPosts.length === 0) {
-      myPostsDiv.innerHTML = '<p class="no-posts">Vous n\'avez pas encore publié de post.</p>';
-      return;
-    }
+    // Charger mes posts
+    async function loadMyPosts() {
+      if (!myPostsDiv || !window.getPosts) return;
+      myPostsDiv.innerHTML = '<p>Chargement...</p>';
 
-    myPostsDiv.innerHTML = '';
-
-    myPosts.forEach(post => {
-      const card = document.createElement('div');
-      card.className = 'my-post-card';
-      card.dataset.id = post.id;
-
-      card.innerHTML = `
-        <div class="my-post-card-info">
-          <div class="my-post-card-title">${post.title || 'Sans titre'}</div>
-          <div class="my-post-card-meta">
-            ${post.category || ''} • ${formatTime(post.created_at || post.date)}
-          </div>
-          <div class="my-post-card-content">${post.content || ''}</div>
-        </div>
-        <div class="my-post-card-actions">
-          <button class="btn-edit-post"   data-id="${post.id}">✏️ Modifier</button>
-          <button class="btn-delete-post" data-id="${post.id}">🗑️ Supprimer</button>
-        </div>
-
-        <div class="edit-post-form" id="edit-form-${post.id}" style="display:none;">
-          <div class="field">
-            <label>Titre</label>
-            <input type="text" class="edit-title" value="${post.title || ''}" required>
-          </div>
-          <div class="field">
-            <label>Catégorie</label>
-            <select class="edit-category">
-              <option value="entrée"  ${post.category === 'entrée'  ? 'selected' : ''}>Entrée</option>
-              <option value="plat"    ${post.category === 'plat'    ? 'selected' : ''}>Plat</option>
-              <option value="dessert" ${post.category === 'dessert' ? 'selected' : ''}>Dessert</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Contenu</label>
-            <textarea class="edit-content" rows="4" required>${post.content || ''}</textarea>
-          </div>
-          <div class="edit-form-btns">
-            <button class="btn-save-post"   data-id="${post.id}">💾 Enregistrer</button>
-            <button class="btn-cancel-edit" data-id="${post.id}">✖ Annuler</button>
-          </div>
-          <p class="edit-post-status" style="display:none;"></p>
-        </div>
-      `;
-
-      myPostsDiv.appendChild(card);
-    });
-  }
-
-  await loadMyPosts();
-
-  // ── Délégation d'événements ─────────────────────────────────
-  if (myPostsDiv) {
-    myPostsDiv.addEventListener('click', async (e) => {
-
-      // SUPPRIMER
-      if (e.target.closest('.btn-delete-post')) {
-        const btn    = e.target.closest('.btn-delete-post');
-        const postId = btn.dataset.id;
-        if (!confirm('Supprimer ce post définitivement ?')) return;
-
-        btn.disabled    = true;
-        btn.textContent = '⏳';
-
-        const { error } = await window.supabaseClient
-          .from('posts')
-          .delete()
-          .eq('id', postId);
-
-        if (error) {
-          btn.disabled    = false;
-          btn.textContent = '🗑️ Supprimer';
-          showAccountStatus('Erreur lors de la suppression.', 'error');
-        } else {
-          const card = myPostsDiv.querySelector(`.my-post-card[data-id="${postId}"]`);
-          if (card) card.remove();
-          if (myPostsDiv.querySelectorAll('.my-post-card').length === 0) {
-            myPostsDiv.innerHTML = '<p class="no-posts">Vous n\'avez pas encore publié de post.</p>';
-          }
-          showAccountStatus('Post supprimé.', 'success');
-        }
-      }
-
-      // OUVRIR FORMULAIRE MODIFICATION
-      if (e.target.closest('.btn-edit-post')) {
-        const btn    = e.target.closest('.btn-edit-post');
-        const postId = btn.dataset.id;
-
-        // Fermer les autres formulaires
-        myPostsDiv.querySelectorAll('.edit-post-form').forEach(f => {
-          if (f.id !== `edit-form-${postId}`) f.style.display = 'none';
-        });
-
-        const form = document.getElementById(`edit-form-${postId}`);
-        if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
-      }
-
-      // ANNULER
-      if (e.target.closest('.btn-cancel-edit')) {
-        const postId = e.target.closest('.btn-cancel-edit').dataset.id;
-        const form   = document.getElementById(`edit-form-${postId}`);
-        if (form) form.style.display = 'none';
-      }
-
-      // SAUVEGARDER
-      if (e.target.closest('.btn-save-post')) {
-        const btn    = e.target.closest('.btn-save-post');
-        const postId = btn.dataset.id;
-        const form   = document.getElementById(`edit-form-${postId}`);
-        const status = form?.querySelector('.edit-post-status');
-
-        const newTitle    = form?.querySelector('.edit-title')?.value.trim();
-        const newCategory = form?.querySelector('.edit-category')?.value;
-        const newContent  = form?.querySelector('.edit-content')?.value.trim();
-
-        if (!newTitle || !newContent || !newCategory) {
-          if (status) {
-            status.textContent = 'Tous les champs sont obligatoires.';
-            status.className   = 'login-alert login-alert--error';
-            status.style.display = 'block';
-          }
-          return;
-        }
-
-        btn.disabled    = true;
-        btn.textContent = '⏳';
-
-        const { data: updatedPost, error } = await window.supabaseClient
-          .from('posts')
-          .update({ title: newTitle, category: newCategory, content: newContent })
-          .eq('id', postId)
-          .select('*')
-          .single();
-
-        btn.disabled    = false;
-        btn.textContent = '💾 Enregistrer';
-
-        if (error || !updatedPost) {
-          if (status) {
-            status.textContent   = 'Erreur lors de la mise à jour.';
-            status.className     = 'login-alert login-alert--error';
-            status.style.display = 'block';
-          }
-          return;
-        }
-
-        // Mettre à jour la carte sans rechargement
-        const card = myPostsDiv.querySelector(`.my-post-card[data-id="${postId}"]`);
-        if (card) {
-          card.querySelector('.my-post-card-title').textContent   = newTitle;
-          card.querySelector('.my-post-card-content').textContent = newContent;
-          card.querySelector('.my-post-card-meta').textContent    =
-            `${newCategory} • ${formatTime(updatedPost.created_at)}`;
-        }
-
-        if (form) form.style.display = 'none';
-        showAccountStatus('Post mis à jour avec succès !', 'success');
-      }
-    });
-  }
-
-  // ── Formulaire profil ────────────────────────────────────────
-  if (accountForm) {
-    accountForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      const username        = document.getElementById('display_name').value.trim();
-      const email           = document.getElementById('email').value.trim().toLowerCase();
-      const password        = document.getElementById('newPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-
-      if (!username || !email) {
-        showAccountStatus('Le nom affiché et l\'e-mail sont obligatoires.', 'error'); return;
-      }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showAccountStatus('Veuillez saisir une adresse e-mail valide.', 'error'); return;
-      }
-      if (password && password.length < 6) {
-        showAccountStatus('Le mot de passe doit contenir au moins 6 caractères.', 'error'); return;
-      }
-      if (password && password !== confirmPassword) {
-        showAccountStatus('Les mots de passe ne correspondent pas.', 'error'); return;
-      }
-
-      const submitBtn = accountForm.querySelector('button[type="submit"]');
-      if (submitBtn) submitBtn.disabled = true;
-
-      const { user: updatedUser, error } = await window.updateUserProfile(user.id, {
-        username, email, password: password || undefined,
-      });
-
-      if (submitBtn) submitBtn.disabled = false;
-
+      const { data, error } = await window.getPosts();
       if (error) {
-        showAccountStatus(error.message || 'Erreur lors de la mise à jour.', 'error'); return;
+        myPostsDiv.innerHTML = '<p>Erreur de chargement.</p>';
+        return;
       }
 
-      if (updatedUser) {
-        localStorage.setItem('cookimeUser', JSON.stringify(updatedUser));
-        if (nameEl)     nameEl.textContent  = updatedUser.username || 'Utilisateur';
-        if (emailEl)    emailEl.textContent = updatedUser.email    || '';
-        if (inputName)  inputName.value     = updatedUser.username || '';
-        if (inputEmail) inputEmail.value    = updatedUser.email    || '';
-        showAccountStatus('Profil mis à jour avec succès.', 'success');
+      const myPosts = (data || []).filter(p =>
+        p.user_id === user.id ||
+        p.author  === user.username ||
+        p.author  === user.email
+      );
+
+      if (myPosts.length === 0) {
+        myPostsDiv.innerHTML = '<p class="no-posts">Vous n\'avez pas encore publié de post.</p>';
+        return;
       }
-    });
+
+      myPostsDiv.innerHTML = '';
+
+      myPosts.forEach(post => {
+        const card = document.createElement('div');
+        card.className = 'my-post-card';
+        card.dataset.id = post.id;
+
+        card.innerHTML = `
+          <div class="my-post-card-info">
+            <div class="my-post-card-title">${post.title || 'Sans titre'}</div>
+            <div class="my-post-card-meta">
+              ${post.category || ''} • ${formatTime(post.created_at || post.date)}
+            </div>
+            <div class="my-post-card-content">${post.content || ''}</div>
+          </div>
+          <div class="my-post-card-actions">
+            <button class="btn-edit-post"   data-id="${post.id}">✏️ Modifier</button>
+            <button class="btn-delete-post" data-id="${post.id}">🗑️ Supprimer</button>
+          </div>
+          <div class="edit-post-form" id="edit-form-${post.id}" style="display:none;">
+            <div class="field">
+              <label>Titre</label>
+              <input type="text" class="edit-title" value="${post.title || ''}" required>
+            </div>
+            <div class="field">
+              <label>Catégorie</label>
+              <select class="edit-category">
+                <option value="entrée"  ${post.category === 'entrée'  ? 'selected' : ''}>Entrée</option>
+                <option value="plat"    ${post.category === 'plat'    ? 'selected' : ''}>Plat</option>
+                <option value="dessert" ${post.category === 'dessert' ? 'selected' : ''}>Dessert</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Contenu</label>
+              <textarea class="edit-content" rows="4" required>${post.content || ''}</textarea>
+            </div>
+            <div class="edit-form-btns">
+              <button type="button" class="btn-save-post"   data-id="${post.id}">💾 Enregistrer</button>
+              <button type="button" class="btn-cancel-edit" data-id="${post.id}">✖ Annuler</button>
+            </div>
+            <p class="edit-post-status" style="display:none;"></p>
+          </div>
+        `;
+
+        myPostsDiv.appendChild(card);
+      });
+    }
+
+    await loadMyPosts();
+
+    // Délégation d'événements
+    if (myPostsDiv) {
+      myPostsDiv.addEventListener('click', async (e) => {
+        // MODIFIER
+        if (e.target.closest('.btn-edit-post')) {
+          const postId = e.target.closest('.btn-edit-post').dataset.id;
+          const form = document.getElementById(`edit-form-${postId}`);
+          if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // ANNULER
+        if (e.target.closest('.btn-cancel-edit')) {
+          const postId = e.target.closest('.btn-cancel-edit').dataset.id;
+          const form   = document.getElementById(`edit-form-${postId}`);
+          if (form) form.style.display = 'none';
+        }
+
+        // SAUVEGARDER
+        if (e.target.closest('.btn-save-post')) {
+          const btn    = e.target.closest('.btn-save-post');
+          const postId = btn.dataset.id;
+          const form   = document.getElementById(`edit-form-${postId}`);
+          const status = form?.querySelector('.edit-post-status');
+
+          const newTitle    = form?.querySelector('.edit-title')?.value.trim();
+          const newCategory = form?.querySelector('.edit-category')?.value;
+          const newContent  = form?.querySelector('.edit-content')?.value.trim();
+
+          if (!newTitle || !newContent || !newCategory) {
+            if (status) {
+              status.textContent = 'Tous les champs sont obligatoires.';
+              status.className   = 'login-alert login-alert--error';
+              status.style.display = 'block';
+            }
+            return;
+          }
+
+          btn.disabled    = true;
+          btn.textContent = '⏳';
+
+          if (window.updatePost) {
+            const { error } = await window.updatePost(postId, {
+              title: newTitle,
+              content: newContent,
+              category: newCategory
+            });
+
+            if (error) {
+              if (status) {
+                status.textContent = 'Erreur lors de la mise à jour.';
+                status.className   = 'login-alert login-alert--error';
+                status.style.display = 'block';
+              }
+              btn.disabled = false;
+              btn.textContent = '💾 Enregistrer';
+              return;
+            }
+
+            if (status) {
+              status.textContent = 'Post mis à jour !';
+              status.className   = 'login-alert login-alert--success';
+              status.style.display = 'block';
+            }
+
+            setTimeout(() => {
+              form.style.display = 'none';
+              loadMyPosts();
+            }, 800);
+          }
+        }
+
+        // SUPPRIMER
+        if (e.target.closest('.btn-delete-post')) {
+          const btn    = e.target.closest('.btn-delete-post');
+          const postId = btn.dataset.id;
+
+          if (!confirm('Êtes-vous sûr de vouloir supprimer ce post ?')) return;
+
+          btn.disabled    = true;
+          btn.textContent = '⏳';
+
+          if (window.deletePost) {
+            const { error } = await window.deletePost(postId);
+
+            if (error) {
+              showAccountStatus('Erreur lors de la suppression.', 'error');
+              btn.disabled    = false;
+              btn.textContent = '🗑️ Supprimer';
+              return;
+            }
+
+            showAccountStatus('Post supprimé.', 'success');
+            loadMyPosts();
+          }
+        }
+      });
+    }
+
+    // Modifier le profil
+    if (accountForm) {
+      accountForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const newUsername = inputName?.value.trim();
+        const newEmail    = inputEmail?.value.trim();
+
+        if (!newUsername || !newEmail) {
+          showAccountStatus('Le nom d\'utilisateur et l\'email sont obligatoires.', 'error');
+          return;
+        }
+
+        const submitBtn = accountForm.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+
+        if (window.updateUser) {
+          const { data: updatedUser, error } = await window.updateUser(user.id, {
+            username: newUsername,
+            email: newEmail
+          });
+
+          if (error) {
+            showAccountStatus('Erreur lors de la mise à jour du profil.', 'error');
+            if (submitBtn) submitBtn.disabled = false;
+            return;
+          }
+
+          if (updatedUser) {
+            localStorage.setItem('cookimeUser', JSON.stringify(updatedUser));
+            if (nameEl)     nameEl.textContent  = updatedUser.username || 'Utilisateur';
+            if (emailEl)    emailEl.textContent = updatedUser.email    || '';
+            if (inputName)  inputName.value     = updatedUser.username || '';
+            if (inputEmail) inputEmail.value    = updatedUser.email    || '';
+            showAccountStatus('Profil mis à jour avec succès.', 'success');
+          }
+
+          if (submitBtn) submitBtn.disabled = false;
+        }
+      });
+    }
   }
-}
 
   // ============================================================
   // PARAMS URL (erreurs serveur)
