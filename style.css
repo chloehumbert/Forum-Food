@@ -1571,3 +1571,58 @@ body.login-page footer {
 .btn-save-post    { background: #c8a96e; color: #fff; border: none; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
 .btn-cancel-edit  { background: #eee; color: #555; border: none; padding: 7px 16px; border-radius: 8px; cursor: pointer; }
 .no-posts         { color: #a08060; font-style: italic; }
+
+
+.post-like-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.like-btn,
+.dislike-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  background: #fff;
+  color: #555;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.like-btn span,
+.dislike-btn span {
+  font-weight: 700;
+}
+
+.like-btn:hover {
+  border-color: #f97316;
+  color: #f97316;
+  transform: translateY(-1px);
+}
+
+.dislike-btn:hover {
+  border-color: #6b7280;
+  color: #374151;
+  transform: translateY(-1px);
+}
+
+.like-btn.active {
+  background: #fff5ed;
+  border-color: #f97316;
+  color: #f97316;
+}
+
+.dislike-btn.active {
+  background: #f3f4f6;
+  border-color: #6b7280;
+  color: #374151;
+}

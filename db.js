@@ -219,7 +219,69 @@ async function getPosts() {
 
   return { data, error };
 }
+// ============================================================
+// LIKES / DISLIKES
+// ============================================================
 
+async function getLikes(postId) {
+  const { data, error } = await supabaseClient
+    .from('post_likes')
+    .select('id, post_id, user_id, type')
+    .eq('post_id', postId);
+
+  return { data, error };
+}
+
+async function toggleLike(postId, userId, type) {
+  if (!postId || !userId) {
+    return { data: null, error: { message: 'Paramètres de vote invalides.' } };
+  }
+  if (!['like', 'dislike'].includes(type)) {
+    return { data: null, error: { message: 'Type de vote invalide.' } };
+  }
+
+  const { data: existingVote, error: fetchError } = await supabaseClient
+    .from('post_likes')
+    .select('id, type')
+    .eq('post_id', postId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (fetchError) {
+    return { data: null, error: fetchError };
+  }
+
+  // Cas 1 : pas encore de vote -> insertion
+  if (!existingVote) {
+    const { data, error } = await supabaseClient
+      .from('post_likes')
+      .insert([{ post_id: postId, user_id: userId, type }])
+      .select('*')
+      .single();
+
+    return { data, error };
+  }
+
+  // Cas 2 : clic sur le même vote -> suppression (toggle off)
+  if (existingVote.type === type) {
+    const { error } = await supabaseClient
+      .from('post_likes')
+      .delete()
+      .eq('id', existingVote.id);
+
+    return { data: null, error };
+  }
+
+  // Cas 3 : changement de vote (like <-> dislike) -> mise à jour
+  const { data, error } = await supabaseClient
+    .from('post_likes')
+    .update({ type })
+    .eq('id', existingVote.id)
+    .select('*')
+    .single();
+
+  return { data, error };
+}
 async function updateUserProfile(userId, updates) {
   if (!userId) {
     return { user: null, error: { message: 'Utilisateur non identifié.' } };
@@ -314,3 +376,5 @@ window.getPostById = getPostById;
 window.updatePost = updatePost;
 window.logoutSupabase = logoutSupabase;
 window.getCurrentUser = getCurrentUser;
+window.getLikes = getLikes;
+window.toggleLike = toggleLike;
