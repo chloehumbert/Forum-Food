@@ -47,8 +47,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const image = document.createElement('img');
         image.src = post.image_url;
         image.alt = post.title || 'Image du post';
-        image.style.maxWidth = '100%';
-        image.style.borderRadius = '10px';
+        image.style.maxWidth = '30%';
+        image.style.borderRadius = '25px';
         image.style.marginTop = '12px';
         card.appendChild(image);
       }
