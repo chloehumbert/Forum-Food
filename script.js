@@ -416,16 +416,105 @@ document.addEventListener('DOMContentLoaded', function () {
             div.innerHTML = `
               <h4>${post.title}</h4>
               <p>${post.content}</p>
-              <button class="delete-post" data-id="${post.id}">
-                Supprimer
-              </button>
+              <div class="post-actions">
+                <button class="edit-post" data-id="${post.id}" data-title="${post.title}" data-content="${post.content}" data-category="${post.category || ''}" data-image="${post.image_url || ''}">
+                  Modifier
+                </button>
+                <button class="delete-post" data-id="${post.id}">
+                  Supprimer
+                </button>
+              </div>
             `;
 
             myPostsContainer.appendChild(div);
 
           });
+          document.querySelectorAll(".edit-post").forEach(btn => {
+            btn.addEventListener("click", () => {
+              const postId = btn.dataset.id;
+              const title = btn.dataset.title || "";
+              const content = btn.dataset.content || "";
+              const category = btn.dataset.category || "";
+              const image = btn.dataset.image || "";
 
+              let editBox = document.getElementById("accountEditBox");
+              if (!editBox) {
+                editBox = document.createElement("div");
+                editBox.id = "accountEditBox";
+                editBox.className = "post-card";
+                editBox.className = "account-edit-box";
+                editBox.innerHTML = `
+                  <h4>Modifier le post</h4>
+
+                  <div class="field">
+                    <label for="editPostTitle">Titre</label>
+                    <input id="editPostTitle" type="text" placeholder="Titre du post">
+                  </div>
+
+                  <div class="field">
+                    <label for="editPostCategory">Catégorie</label>
+                    <select id="editPostCategory">
+                      <option value="">Choisir une catégorie</option>
+                      <option value="entrée">Entrée</option>
+                      <option value="plat">Plat</option>
+                      <option value="dessert">Dessert</option>
+                    </select>
+                  </div>
+
+                  <div class="field">
+                    <label for="editPostContent">Contenu</label>
+                    <textarea id="editPostContent" rows="5" placeholder="Contenu du post"></textarea>
+                  </div>
+
+                  <div class="field">
+                    <label for="editPostImage">URL image</label>
+                    <input id="editPostImage" type="text" placeholder="URL de l'image">
+                  </div>
+
+                  <div class="post-actions">
+                    <button type="button" id="saveEditedPost" class="btn-save-edit">Enregistrer</button>
+                    <button type="button" id="cancelEditedPost" class="btn-cancel-edit">Annuler</button>
+                  </div>
+                `;
+                myPostsContainer.prepend(editBox);
+              }
+
+              document.getElementById("editPostTitle").value = title;
+              document.getElementById("editPostContent").value = content;
+              document.getElementById("editPostCategory").value = category;
+              document.getElementById("editPostImage").value = image;
+
+              document.getElementById("saveEditedPost").onclick = async () => {
+                const updatedTitle = document.getElementById("editPostTitle").value.trim();
+                const updatedContent = document.getElementById("editPostContent").value.trim();
+                const updatedCategory = document.getElementById("editPostCategory").value;
+                const updatedImage = document.getElementById("editPostImage").value.trim();
+
+                const { error } = await window.supabaseClient
+                  .from("posts")
+                  .update({
+                    title: updatedTitle,
+                    content: updatedContent,
+                    category: updatedCategory,
+                    image_url: updatedImage || null
+                  })
+                  .eq("id", postId);
+
+                if (!error) {
+                  editBox.remove();
+                  loadMyPosts();
+                } else {
+                  alert("Impossible de modifier le post.");
+                }
+              };
+
+              document.getElementById("cancelEditedPost").onclick = () => {
+                editBox.remove();
+              };
+            });
+          });
           document.querySelectorAll(".delete-post").forEach(btn => {
+          
 
             btn.addEventListener("click", async () => {
 

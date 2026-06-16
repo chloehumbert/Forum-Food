@@ -175,6 +175,8 @@ async function deletePost(postId) {
   return error;
 }
 
+
+
 // Rendre ces helpers accessibles globalement au script client
 window.getUserById = getUserById;
 window.getUserByEmail = getUserByEmail;

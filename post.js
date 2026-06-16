@@ -1,43 +1,46 @@
 document.addEventListener("DOMContentLoaded", async () => {
-
   // --- Récupération de l'ID du post ---
-  const postId = parseInt(new URLSearchParams(window.location.search).get("id"));
+  const postId = parseInt(new URLSearchParams(window.location.search).get("id"), 10);
   if (!postId) {
     alert("Post introuvable.");
     window.location.href = "posts.html";
     return;
   }
 
-  // --- Sélecteurs ---
+  // --- Sélecteurs pour le post ---
   const titleEl = document.getElementById("post-title");
   const metaEl = document.getElementById("post-meta");
   const imgEl = document.getElementById("post-image");
   const contentEl = document.getElementById("post-content");
-
-  const likeBtn = document.getElementById("like-btn");
   const likesCountEl = document.getElementById("likes-count");
+  const likeBtn = document.getElementById("like-btn");
 
+  // --- Sélecteurs pour l'édition ---
   const editControls = document.getElementById("edit-controls");
   const editBtn = document.getElementById("edit-btn");
   const deleteBtn = document.getElementById("delete-btn");
-
   const editForm = document.getElementById("edit-form");
   const editTitle = document.getElementById("edit-title");
   const editContent = document.getElementById("edit-content");
   const editCategory = document.getElementById("edit-category");
   const editImage = document.getElementById("edit-image");
-
   const saveEdit = document.getElementById("save-edit");
   const cancelEdit = document.getElementById("cancel-edit");
 
-  const commentsList = document.getElementById("comments-list");
-  const commentForm = document.getElementById("comment-form");
-  const commentText = document.getElementById("comment-text");
+  // --- Vérification des éléments obligatoires ---
+  if (
+    !titleEl || !metaEl || !contentEl || !likesCountEl || !likeBtn ||
+    !editControls || !editBtn || !deleteBtn || !editForm ||
+    !editTitle || !editContent || !editCategory || !saveEdit || !cancelEdit
+  ) {
+    console.error("Un ou plusieurs éléments du DOM sont manquants pour le post.");
+    return;
+  }
 
   let post = null;
   let userRow = null;
 
-  // --- Récupération de l'utilisateur connecté ---
+  // --- Chargement de l'utilisateur connecté ---
   async function loadUser() {
     const { data } = await window.supabaseClient.auth.getUser();
     if (!data.user) return null;
@@ -51,108 +54,142 @@ document.addEventListener("DOMContentLoaded", async () => {
     return row;
   }
 
-  userRow = await loadUser();
-
-  // --- Charger le post ---
+  // --- Chargement du post ---
   async function loadPost() {
-    post = await window.db.getPostById(postId);
-
-    titleEl.textContent = post.title;
-    contentEl.textContent = post.content;
-
-    metaEl.textContent =
-      `${post.author} • ${post.category} • ${new Date(post.created_at).toLocaleString()}`;
-
-    if (post.image_url) {
-      imgEl.src = post.image_url;
-      imgEl.style.display = "block";
+    if (!window.db || !window.db.getPostById) {
+      alert("Impossible de charger le post.");
+      window.location.href = "posts.html";
+      return;
     }
 
-    const likes = await window.db.getLikesCount(postId);
-    likesCountEl.textContent = `${likes} likes`;
+    try {
+      post = await window.db.getPostById(postId);
+      if (!post) {
+        alert("Post introuvable.");
+        window.location.href = "posts.html";
+        return;
+      }
 
-    if (userRow && userRow.id === post.user_id) {
-      editControls.style.display = "block";
+      // Mise à jour du DOM
+      titleEl.textContent = post.title || "";
+      contentEl.textContent = post.content || "";
+      metaEl.textContent = `${post.author || "Utilisateur"} • ${post.category || ""} • ${new Date(post.created_at || post.date).toLocaleString("fr-FR")}`;
+
+      if (post.image_url) {
+        imgEl.src = post.image_url;
+        imgEl.style.display = "block";
+      } else {
+        imgEl.style.display = "none";
+      }
+
+      // Chargement des likes
+      if (window.db.getLikesCount) {
+        const likes = await window.db.getLikesCount(postId);
+        likesCountEl.textContent = `${likes || 0} likes`;
+      }
+
+      // Affichage des contrôles d'édition si l'utilisateur est l'auteur
+      if (userRow && userRow.id === post.user_id) {
+        editControls.style.display = "block";
+      } else {
+        editControls.style.display = "none";
+      }
+
+      // Mise à jour du bouton Like
+      if (window.db.hasLiked) {
+        const hasLiked = await window.db.hasLiked(postId);
+        likeBtn.textContent = hasLiked ? "💔 Unlike" : "❤️ Like";
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement du post :", error);
+      alert("Impossible de charger le post.");
     }
   }
 
-  // --- Charger les commentaires ---
-  async function loadComments() {
-    const comments = await window.db.getComments(postId);
-    commentsList.innerHTML = "";
+  // --- Gestion du bouton Like ---
+  if (likeBtn) {
+    likeBtn.addEventListener("click", async () => {
+      if (!window.db || !window.db.toggleLike) {
+        alert("Impossible de gérer les likes.");
+        return;
+      }
 
-    comments.forEach(c => {
-      const div = document.createElement("div");
-      div.classList.add("forum-post");
-
-      div.innerHTML = `
-        <div class="post-body">
-          <strong>${c.author}</strong>
-          <div class="post-date">${new Date(c.date).toLocaleString()}</div>
-          <p>${c.content}</p>
-        </div>
-      `;
-
-      commentsList.appendChild(div);
+      try {
+        const result = await window.db.toggleLike(postId);
+        likesCountEl.textContent = `${result.total || 0} likes`;
+        likeBtn.textContent = result.liked ? "💔 Unlike" : "❤️ Like";
+      } catch (error) {
+        console.error("Erreur lors du like :", error);
+        alert("Impossible de mettre à jour le like.");
+      }
     });
   }
 
-  // --- Like ---
-  likeBtn.addEventListener("click", async () => {
-    const result = await window.db.toggleLike(postId);
-    likesCountEl.textContent = `${result.total} likes`;
-    likeBtn.textContent = result.liked ? "💔 Unlike" : "❤️ Like";
-  });
-
-  // --- Commentaire ---
-  commentForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    await window.db.createComment(postId, commentText.value);
-    commentText.value = "";
-    loadComments();
-  });
-
-  // --- Modifier ---
-  editBtn.addEventListener("click", () => {
-    editForm.style.display = "block";
-
-    editTitle.value = post.title;
-    editContent.value = post.content;
-    editCategory.value = post.category;
-  });
-
-  cancelEdit.addEventListener("click", () => {
-    editForm.style.display = "none";
-  });
-
-  saveEdit.addEventListener("click", async () => {
-    let imageUrl = post.image_url;
-
-    if (editImage.files[0]) {
-      imageUrl = await window.db.uploadPostImage(editImage.files[0]);
-    }
-
-    post = await window.db.updatePost(postId, {
-      title: editTitle.value,
-      content: editContent.value,
-      category: editCategory.value,
-      imageUrl
+  // --- Gestion de l'édition ---
+  if (editBtn && editForm) {
+    editBtn.addEventListener("click", () => {
+      if (!post) return;
+      editTitle.value = post.title || "";
+      editContent.value = post.content || "";
+      editCategory.value = post.category || "";
+      editForm.style.display = "block";
     });
+  }
 
-    editForm.style.display = "none";
-    loadPost();
-  });
+  if (cancelEdit && editForm) {
+    cancelEdit.addEventListener("click", () => {
+      editForm.style.display = "none";
+    });
+  }
 
-  // --- Supprimer ---
-  deleteBtn.addEventListener("click", async () => {
-    if (!confirm("Supprimer ce post ?")) return;
+  if (saveEdit && editForm) {
+    saveEdit.addEventListener("click", async () => {
+      if (!post || !window.db || !window.db.updatePost) return;
 
-    await window.db.deletePost(postId);
-    window.location.href = "posts.html";
-  });
+      try {
+        let imageUrl = post.image_url;
+        if (editImage && editImage.files[0]) {
+          imageUrl = await window.db.uploadPostImage(editImage.files[0]);
+        }
+
+        const updatedPost = await window.db.updatePost(postId, {
+          title: editTitle.value,
+          content: editContent.value,
+          category: editCategory.value,
+          image_url: imageUrl,
+        });
+
+        if (updatedPost) {
+          post = updatedPost;
+          editForm.style.display = "none";
+          await loadPost();
+          alert("Post mis à jour avec succès !");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour du post :", error);
+        alert("Impossible de mettre à jour le post.");
+      }
+    });
+  }
+
+  // --- Gestion de la suppression ---
+  if (deleteBtn) {
+    deleteBtn.addEventListener("click", async () => {
+      if (!confirm("Supprimer ce post ? Cette action est irréversible.")) return;
+      if (!window.db || !window.db.deletePost) return;
+
+      try {
+        await window.db.deletePost(postId);
+        alert("Post supprimé avec succès.");
+        window.location.href = "posts.html";
+      } catch (error) {
+        console.error("Erreur lors de la suppression du post :", error);
+        alert("Impossible de supprimer le post.");
+      }
+    });
+  }
 
   // --- Initialisation ---
+  userRow = await loadUser();
   await loadPost();
-  await loadComments();
 });

@@ -1285,3 +1285,53 @@ body.login-page footer {
   position: relative;
   z-index: 1;
 }
+
+
+.post-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.post-actions button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.edit-post {
+  background: #f0c040;
+  color: #000;
+}
+
+.delete-post {
+  background: #d9534f;
+  color: #fff;
+}
+
+
+.field input {
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid rgba(200,117,58,.12);
+  background:var(--shiro2);
+}
+
+
+.field textarea,
+.field select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(200,117,58,.12);
+  background: var(--shiro2);
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--sumi);
+  resize: vertical;
+}
+
+
